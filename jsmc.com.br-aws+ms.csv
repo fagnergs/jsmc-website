@@ -1,0 +1,29 @@
+﻿Registros MX
+Prioridade,Nome do host,Pontos de endereçamento ou valor,TTL
+0,@,jsmc-com-br.mail.protection.outlook.com,3600
+
+Registros CNAME
+Nome do host,Pontos de endereçamento ou valor,TTL
+_e60311ef4156e1fc6240efdae0755f88,_37bb647a9274e6f40b2961c0d59614ed.jkddzztszm.acm-validations.aws,3600
+www,d378ca32dt91zn.cloudfront.net,3600
+autodiscover,autodiscover.outlook.com,3600
+lyncdiscover,webdir.online.lync.com,3600
+sip,sipdir.online.lync.com,3600
+enterpriseenrollment,enterpriseenrollment.manage.microsoft.com,3600
+enterpriseregistration,enterpriseregistration.windows.net,3600
+
+Registros TXT
+Nome TXT,Valor TXT,TTL
+@,v=spf1 include:spf.protection.outlook.com -all,3600
+
+Registros SRV
+Serviço,Protocolo,Porta,Peso,Prioridade,TTL,Nome,Destino
+_sipfederationtls,_tcp,5061,1,100,3600,@,sipfed.online.lync.com
+_sip,_tls,443,1,100,3600,@,sipdir.online.lync.com
+
+Registros NS
+Pontos de endereçamento ou valor
+ns1.bdm.microsoftonline.com
+ns2.bdm.microsoftonline.com
+ns3.bdm.microsoftonline.com
+ns4.bdm.microsoftonline.com
