@@ -20,8 +20,8 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          aws s3 sync . s3://jsmc.com.br --delete --exclude "*" --include "*.html" --include "assets/*" --include "css/*" --include "js/*" --include "images/*" --acl public-read
+          aws s3 sync . s3://jsmc.com.br --delete --exclude "*" --include "*.html" --cache-control "public, max-age=60"
 
-      - name: Invalidate CloudFront
+      - name: Invalidate CloudFront cache
         run: |
           aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
