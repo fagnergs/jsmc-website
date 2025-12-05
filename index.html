@@ -3,34 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JSMC | Energia que Move o Brasil</title>
-  <meta name="description" content="Distribuição, Transmissão e Geração de Energia" />
+  <title>JSMC Energia | Distribuição • Transmissão • Geração</title>
+  <meta name="description" content="Soluções completas em energia elétrica para o Brasil" />
   <link rel="icon" href="data:,">
   <style>
-    body { margin:0; font-family: system-ui, sans-serif; background:#0f172a; color:#e2e8f0; }
-    .container { max-width: 1280px; margin:0 auto; padding:2rem; text-align:center; }
-    h1 { font-size: 4rem; margin:0; background: linear-gradient(90deg,#3b82f6,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    p { font-size:1.5rem; margin:1rem 0; }
-    .badge { display:inline-block; background:#1e293b; padding:0.5rem 1rem; border-radius:999px; font-size:0.9rem; margin:0.5rem; }
-    .success { background:#166534; color:#dcfce7; }
-    footer { margin-top:4rem; font-size:0.9rem; color:#64748b; }
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --gray-100: #f8fafc;
+      --gray-200: #e2e8f0;
+      --gray-700: #334155;
+      --gray-900: #0f172a;
+      --success: #10b981;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(to bottom, #f0f9ff, #e0f2fe);
+      color: var(--gray-900);
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 4.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0 0 1rem 0;
+    }
+    header p {
+      font-size: 1.75rem;
+      color: var(--gray-700);
+      margin: 0 0 3rem 0;
+    }
+    .status {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 3rem 0;
+    }
+    .badge {
+      display: inline-block;
+      background: white;
+      color: var(--primary);
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      border: 1px solid #e0e7ff;
+      min-width: 280px;
+    }
+    .badge.success {
+      background: #ecfdf5;
+      color: var(--success);
+      border-color: #a7f3d0;
+    }
+    .highlight {
+      font-size: 2.2rem;
+      color: var(--success);
+      font-weight: 700;
+      margin: 3rem 0;
+    }
+    footer {
+      margin-top: 6rem;
+      color: var(--gray-700);
+      font-size: 0.95rem;
+    }
+    .logo-placeholder {
+      width: 120px;
+      height: 120px;
+      background: white;
+      border-radius: 50%;
+      margin: 0 auto 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>JSMC Energia</h1>
-    <p>Distribuição • Transmissão • Geração</p>
+    <div class="logo-placeholder">JSMC</div>
     
-    <div style="margin:3rem 0;">
-      <p style="font-size:2rem;">Infraestrutura 100% pronta e automatizada</p>
-      <div class="badge success">GitHub + Actions</div>
-      <div class="badge success">AWS S3 + CloudFront + ACM</div>
-      <div class="badge success">HTTPS automático</div>
-      <div class="badge success">CI/CD ativo (push → deploy em &lt;30s)</div>
-      <div class="badge success">Office 365 / DNS Microsoft intacto</div>
+    <header>
+      <h1>JSMC Energia</h1>
+      <p>Distribuição • Transmissão • Geração</p>
+    </header>
+
+    <div class="status">
+      <div class="badge success">Infraestrutura AWS 100% configurada</div>
+      <div class="badge success">GitHub + Actions → CI/CD ativo</div>
+      <div class="badge success">HTTPS automático via CloudFront + ACM</div>
+      <div class="badge success">Deploy automático em &lt;30 segundos</div>
+      <div class="badge success">Office 365 e DNS Microsoft preservados</div>
     </div>
 
-    <p style="font-size:1.8rem; color:#86efac;">
+    <p class="highlight">
       Tudo funcionando perfeitamente! ✅
     </p>
 
