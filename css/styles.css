@@ -1,12 +1,12 @@
 /* ==================== CSS VARIABLES & RESET ==================== */
 :root {
-    --primary: #00A3D9;
-    --secondary: #FF8C42;
-    --dark: #2C3E50;
-    --light: #F5F5F5;
+    --primary: #0F172A;
+    --secondary: #E84C3D;
+    --dark: #0F172A;
+    --light: #FEF5F3;
     --white: #FFFFFF;
-    --gray: #7F8C8D;
-    --gray-dark: #34495E;
+    --gray: #6B7280;
+    --gray-dark: #374151;
     
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
