@@ -3,649 +3,445 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSMC Soluções - Consultoria em Energia e Tecnologia</title>
-    <meta name="description" content="Transformando Energia em Estratégia. Consultoria especializada em infraestrutura energética, SAP S/4HANA e cybersecurity.">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts -->
+    <meta name="description" content="JSMC Soluções - Consultoria especializada em energia, IoT e transformação digital do setor elétrico">
+    <meta name="keywords" content="consultoria energia, IoT, utilidades, grid modernization, ADMS, DERMS">
+    <meta name="author" content="JSMC Soluções">
+    <title>JSMC Soluções - Consultoria em Energia | Inovação e Tecnologia</title>
+    <link rel="canonical" href="https://jsmc.com.br">
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .hero {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.75) 100%), 
-                        url('https://images.unsplash.com/photo-1513828583688-c52646db42da?w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            border-color: #F59E0B;
-        }
-        
-        .btn-amber {
-            background-color: #F59E0B;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-amber:hover {
-            background-color: #D97706;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.3);
-        }
-        
-        .menu-mobile {
-            display: none;
-        }
-        
-        .menu-mobile.active {
-            display: block;
-        }
-        
-        .service-icon {
-            font-size: 2.5rem;
-            color: #F59E0B;
-        }
-        
-        .diferencial-group {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-left: 4px solid #F59E0B;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-white text-gray-900">
-    
-    <!-- Header/Navbar -->
-    <header class="fixed w-full top-0 z-50 bg-slate-900 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
-                <div class="flex items-center">
-                    <div class="text-2xl font-bold text-white">
-                        <span class="text-amber-400">⚡</span> JSMC
-                    </div>
-                    <p class="text-xs text-gray-300 ml-2">Soluções em Energia</p>
-                </div>
-                
-                <!-- Desktop Menu -->
-                <nav class="hidden md:flex space-x-8">
-                    <a href="#servicos" class="text-gray-300 hover:text-amber-400 transition">Serviços</a>
-                    <a href="#diferenciais" class="text-gray-300 hover:text-amber-400 transition">Diferenciais</a>
-                    <a href="#localizacao" class="text-gray-300 hover:text-amber-400 transition">Localização</a>
-                    <a href="#contato" class="text-gray-300 hover:text-amber-400 transition">Contato</a>
-                </nav>
-                
-                <!-- CTA Button -->
-                <a href="#contato" class="hidden md:block btn-amber text-white px-6 py-2 rounded-lg font-semibold">
-                    Solicitar Consultoria
-                </a>
-                
-                <!-- Mobile Menu Toggle -->
-                <button id="menu-toggle" class="md:hidden text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="logo">
+                    <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+                        <!-- Logo JSMC -->
+                        <defs>
+                            <linearGradient id="energyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#00A3D9;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#FF8C42;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Símbolo de energia/conexão -->
+                        <circle cx="12" cy="25" r="8" fill="url(#energyGradient)" opacity="0.9"/>
+                        <path d="M 12 17 L 16 24 L 13 24 L 18 35 L 14 28 L 16 28 Z" fill="url(#energyGradient)"/>
+                        <!-- Texto JSMC -->
+                        <text x="28" y="32" font-family="Poppins" font-size="20" font-weight="700" fill="#2C3E50">JSMC</text>
+                        <text x="28" y="42" font-family="Poppins" font-size="8" font-weight="500" fill="#00A3D9" letter-spacing="1">SOLUÇÕES</text>
                     </svg>
+                </div>
+                <button class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home">Início</a></li>
+                    <li><a href="#about">Sobre</a></li>
+                    <li><a href="#services">Serviços</a></li>
+                    <li><a href="#differentials">Diferenciais</a></li>
+                    <li><a href="#clients">Clientes</a></li>
+                    <li><a href="#contact" class="cta-btn">Contato</a></li>
+                </ul>
             </div>
-            
-            <!-- Mobile Menu -->
-            <div id="mobile-menu" class="menu-mobile border-t border-gray-700">
-                <nav class="flex flex-col space-y-4 py-4">
-                    <a href="#servicos" class="text-gray-300 hover:text-amber-400">Serviços</a>
-                    <a href="#diferenciais" class="text-gray-300 hover:text-amber-400">Diferenciais</a>
-                    <a href="#localizacao" class="text-gray-300 hover:text-amber-400">Localização</a>
-                    <a href="#contato" class="text-gray-300 hover:text-amber-400">Contato</a>
-                    <a href="#contato" class="btn-amber text-white px-4 py-2 rounded-lg font-semibold text-center">
-                        Solicitar Consultoria
-                    </a>
-                </nav>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="home" class="hero" style="background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.75) 100%), url('https://images.unsplash.com/photo-1509391366360-2e938d440dbb?w=1600&q=80'); background-size: cover; background-position: center;">
+        <div class="hero-background">
+            <div class="hero-overlay"></div>
+            <svg class="hero-pattern" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                    <pattern id="waves" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <path d="M0,50 Q25,30 50,50 T100,50" stroke="#00A3D9" stroke-width="2" fill="none" opacity="0.3"/>
+                    </pattern>
+                </defs>
+                <rect width="1200" height="600" fill="url(#waves)"/>
+                <!-- Transmission tower simplified -->
+                <line x1="600" y1="100" x2="600" y2="400" stroke="#FF8C42" stroke-width="3" opacity="0.4"/>
+                <circle cx="600" cy="150" r="40" fill="none" stroke="#00A3D9" stroke-width="2" opacity="0.3"/>
+                <circle cx="600" cy="250" r="50" fill="none" stroke="#00A3D9" stroke-width="2" opacity="0.2"/>
+            </svg>
+        </div>
+        <div class="container hero-content">
+            <h1>Soluções em Energia para o Futuro</h1>
+            <p>Consultoria especializada em toda a cadeia verticalizada: geração, transmissão, distribuição, comercialização e inovação em IoT</p>
+            <div class="cta-buttons">
+                <a href="#contact" class="btn btn-primary">Solicitar Consultoria</a>
+                <a href="#services" class="btn btn-secondary">Conhecer Serviços</a>
             </div>
         </div>
     </header>
-    
-    <!-- Hero Section -->
-    <section class="hero min-h-screen pt-20 flex items-center justify-center">
-        <div class="text-center text-white px-4">
-            <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-                Transformando Energia<br>em Estratégia
-            </h1>
-            <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto">
-                Consultoria especializada em infraestrutura energética, SAP e cybersecurity
-            </p>
-            <a href="#contato" class="btn-amber inline-block text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl">
-                Iniciar Consultoria →
-            </a>
-        </div>
-    </section>
-    
-    <!-- Serviços Section -->
-    <section id="servicos" class="py-20 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-                    Nossos Serviços
-                </h2>
-                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                    Soluções integradas para modernização de infraestrutura energética
-                </p>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="section-header">
+                <h2>Quem Somos</h2>
+                <div class="header-line"></div>
             </div>
-            
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Card 1 -->
-                <div class="card-hover bg-white p-8 rounded-lg border border-gray-200">
-                    <div class="service-icon mb-4">⚙️</div>
-                    <h3 class="text-2xl font-bold text-slate-900 mb-4">SAP S/4HANA</h3>
-                    <p class="text-gray-600 mb-6">
-                        Implementação e otimização de processos ERP. Redução de custos operacionais e aumento de eficiência em seus processos críticos.
-                    </p>
-                    <a href="#contato" class="text-amber-400 font-semibold hover:text-amber-500">
-                        Saiba mais →
-                    </a>
+            <div class="about-grid">
+                <div class="about-text">
+                    <p>Empresa especializada em inovação, prospecção, planejamento, implementação e desenvolvimento de projetos específicos para setor elétrico, setor industrial, agricultura e condomínios de alto padrão.</p>
+                    <p><strong>Nossa razão de ser:</strong> Contribuir para a construção de soluções estratégicas sustentáveis e diferenciadas, colocando nosso know-how a serviço de organizações que buscam garantir excelência e compromisso em suas realizações.</p>
                 </div>
-                
-                <!-- Card 2 -->
-                <div class="card-hover bg-white p-8 rounded-lg border border-gray-200">
-                    <div class="service-icon mb-4">🔐</div>
-                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Cybersecurity</h3>
-                    <p class="text-gray-600 mb-6">
-                        NIST e ISO 27001 compliance. Proteção de infraestrutura crítica com estratégias de segurança especializadas em energia.
-                    </p>
-                    <a href="#contato" class="text-amber-400 font-semibold hover:text-amber-500">
-                        Saiba mais →
-                    </a>
-                </div>
-                
-                <!-- Card 3 -->
-                <div class="card-hover bg-white p-8 rounded-lg border border-gray-200">
-                    <div class="service-icon mb-4">⚡</div>
-                    <h3 class="text-2xl font-bold text-slate-900 mb-4">OT/IT Security</h3>
-                    <p class="text-gray-600 mb-6">
-                        Integração segura de sistemas operacionais e de TI/TO. Proteção de ambientes críticos e SCADA com expertise especializada.
-                    </p>
-                    <a href="#contato" class="text-amber-400 font-semibold hover:text-amber-500">
-                        Saiba mais →
-                    </a>
-                </div>
-                
-                <!-- Card 4 -->
-                <div class="card-hover bg-white p-8 rounded-lg border border-gray-200">
-                    <div class="service-icon mb-4">🚀</div>
-                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Transformação Digital</h3>
-                    <p class="text-gray-600 mb-6">
-                        Modernização de processos e sistemas legados. Implementação de tecnologias emergentes para competitividade.
-                    </p>
-                    <a href="#contato" class="text-amber-400 font-semibold hover:text-amber-500">
-                        Saiba mais →
-                    </a>
+                <div class="about-highlights">
+                    <div class="highlight-item">
+                        <div class="highlight-icon">
+                            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="30" r="28" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                                <path d="M30,15 L40,25 L40,45 L20,45 L20,25 Z" fill="#00A3D9" opacity="0.2" stroke="#00A3D9" stroke-width="1.5"/>
+                                <rect x="24" y="30" width="12" height="8" fill="none" stroke="#FF8C42" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <h4>Experiência Setorial</h4>
+                        <p>Profundos conhecimentos em energia, transmissão e distribuição</p>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-icon">
+                            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="30" r="28" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                                <path d="M20,30 L28,38 L40,22" stroke="#FF8C42" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h4>Inovação Comprovada</h4>
+                        <p>Projetos de PDI com resultados mensuráveis</p>
+                    </div>
+                    <div class="highlight-item">
+                        <div class="highlight-icon">
+                            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="30" r="28" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                                <circle cx="20" cy="25" r="3" fill="#FF8C42"/>
+                                <circle cx="30" cy="20" r="3" fill="#FF8C42"/>
+                                <circle cx="40" cy="25" r="3" fill="#FF8C42"/>
+                                <line x1="20" y1="25" x2="30" y2="20" stroke="#00A3D9" stroke-width="1.5"/>
+                                <line x1="30" y1="20" x2="40" y2="25" stroke="#00A3D9" stroke-width="1.5"/>
+                                <path d="M25,30 Q30,38 35,30" stroke="#FF8C42" stroke-width="2" fill="none"/>
+                            </svg>
+                        </div>
+                        <h4>Equipe Multidisciplinar</h4>
+                        <p>Software, hardware e expertise de campo integrados</p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-    
-    <!-- Diferenciais Section -->
-    <section id="diferenciais" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-                    Por que escolher JSMC?
-                </h2>
-                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                    20+ anos de expertise em setor energético com resultados comprovados
-                </p>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nossos Serviços</h2>
+                <div class="header-line"></div>
+                <p class="section-subtitle">Soluções completas para toda a cadeia de energia</p>
             </div>
             
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- Diferencial 1 -->
-                <div class="diferencial-group p-8 rounded-lg">
-                    <div class="text-3xl mb-4">🎯</div>
-                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Experiência</h3>
-                    <ul class="space-y-3 text-gray-700">
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>20+ anos no setor energético</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>Neoenergia, TAESA, Elektro, Kompare</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>Projetos em 5 países</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>Nível C executivo</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>Bilíngue PT/EN</span>
-                        </li>
+            <div class="services-grid">
+                <!-- Categoria 1: Processos de Energia -->
+                <div class="service-category">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="40" cy="40" r="38" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                            <path d="M40,20 L50,30 L45,40 L55,50 L40,55 L25,50 L35,40 L30,30 Z" fill="#FF8C42" opacity="0.3" stroke="#FF8C42" stroke-width="2"/>
+                            <circle cx="40" cy="40" r="5" fill="#00A3D9"/>
+                        </svg>
+                    </div>
+                    <h3>Processos de Energia</h3>
+                    <ul class="service-list">
+                        <li>Otimização de Processos Energéticos</li>
+                        <li>Eficiência Energética em Industrias</li>
+                        <li>Geração Distribuída e Renovável</li>
+                        <li>Integração de Fontes de Energia</li>
+                        <li>Planejamento Energético Estratégico</li>
+                        <li>Análise e Modelagem de Sistemas</li>
                     </ul>
                 </div>
-                
-                <!-- Diferencial 2 -->
-                <div class="diferencial-group p-8 rounded-lg">
-                    <div class="text-3xl mb-4">⚡</div>
-                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Tecnologia</h3>
-                    <ul class="space-y-3 text-gray-700">
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>SAP S/4HANA expert certified</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>NIST Framework implementação</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>ISO 27001 certified</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>OT/IT Security specialist</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>Frameworks atuais</span>
-                        </li>
+
+                <!-- Categoria 2: Automação e Utilities -->
+                <div class="service-category">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="40" cy="40" r="38" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                            <rect x="25" y="25" width="30" height="30" rx="3" fill="none" stroke="#FF8C42" stroke-width="2"/>
+                            <circle cx="32" cy="32" r="2" fill="#00A3D9"/>
+                            <circle cx="48" cy="32" r="2" fill="#00A3D9"/>
+                            <circle cx="32" cy="48" r="2" fill="#00A3D9"/>
+                            <circle cx="48" cy="48" r="2" fill="#00A3D9"/>
+                            <line x1="32" y1="32" x2="48" y2="48" stroke="#FF8C42" stroke-width="1" opacity="0.5"/>
+                        </svg>
+                    </div>
+                    <h3>Automação & Utilities</h3>
+                    <ul class="service-list">
+                        <li>Grid Modernization (GM)</li>
+                        <li>Advanced Distribution Management Systems (ADMS)</li>
+                        <li>Distributed Energy Resource Systems (DERMS)</li>
+                        <li>Distribution System Operation (DSO)</li>
+                        <li>Consultoria de Assuntos Regulatórios</li>
+                        <li>Testes e Comissionamento</li>
                     </ul>
                 </div>
-                
-                <!-- Diferencial 3 -->
-                <div class="diferencial-group p-8 rounded-lg">
-                    <div class="text-3xl mb-4">🏆</div>
-                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Resultados</h3>
-                    <ul class="space-y-3 text-gray-700">
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>Redução de 30%+ em custos</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>Uptime 99.9% garantido</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>ROI comprovado</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>Métricas validadas</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-3">✓</span>
-                            <span>Satisfação 100%</span>
-                        </li>
+
+                <!-- Categoria 3: PDI, Operação e Segurança -->
+                <div class="service-category">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="40" cy="40" r="38" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                            <rect x="28" y="28" width="24" height="24" rx="2" fill="none" stroke="#FF8C42" stroke-width="2"/>
+                            <circle cx="40" cy="40" r="6" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                            <path d="M40,38 L42,40 L40,42" fill="#FF8C42" stroke="#FF8C42" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <h3>PDI, Operação & Segurança</h3>
+                    <ul class="service-list">
+                        <li>Pesquisa, Desenvolvimento e Inovação (PDI)</li>
+                        <li>Operação e Manutenção (O&M)</li>
+                        <li>Cybersegurança [TI/TO]</li>
+                        <li>BESS - Battery Energy Storage System</li>
+                        <li>Due Diligence para aquisições e fusões</li>
+                        <li>Treinamento especializado</li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
-    
-    <!-- Clientes Section -->
-    <section class="py-20 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl font-bold text-slate-900 mb-4">Clientes Confiáveis</h2>
-                <p class="text-xl text-gray-600">
-                    Confiado por líderes do setor energético
-                </p>
+
+    <!-- Differentials Section -->
+    <section id="differentials" class="differentials">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nossos Diferenciais</h2>
+                <div class="header-line"></div>
             </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
-                <div class="text-center text-gray-400 font-bold">
-                    🏢 Neoenergia
+            <div class="differentials-grid">
+                <div class="differential-card">
+                    <div class="card-number">01</div>
+                    <h4>Soluções Inovadoras</h4>
+                    <p>Produtos e serviços customizados com tecnologias de ponta para seu desafio</p>
                 </div>
-                <div class="text-center text-gray-400 font-bold">
-                    ⚡ TAESA
+                <div class="differential-card">
+                    <div class="card-number">02</div>
+                    <h4>Novas Tecnologias</h4>
+                    <p>Sempre atualizado com as últimas tendências do setor energético</p>
                 </div>
-                <div class="text-center text-gray-400 font-bold">
-                    🔌 Elektro
+                <div class="differential-card">
+                    <div class="card-number">03</div>
+                    <h4>Visão Estratégica</h4>
+                    <p>Análise profunda dos seus negócios com foco em resultados sustentáveis</p>
                 </div>
-                <div class="text-center text-gray-400 font-bold">
-                    ⚙️ Kompare
+                <div class="differential-card">
+                    <div class="card-number">04</div>
+                    <h4>Best Practices</h4>
+                    <p>Metodologia sólida baseada em padrões internacionais comprovados</p>
                 </div>
-                <div class="text-center text-gray-400 font-bold">
-                    🌐 CESP
+                <div class="differential-card">
+                    <div class="card-number">05</div>
+                    <h4>Expertise em Negócios</h4>
+                    <p>Profundo conhecimento dos processos e dinâmicas do setor elétrico</p>
                 </div>
-                <div class="text-center text-gray-400 font-bold">
-                    💡 Enel
+                <div class="differential-card">
+                    <div class="card-number">06</div>
+                    <h4>Independência</h4>
+                    <p>Recomendações neutras, sem vieses de fornecedores específicos</p>
                 </div>
-                <div class="text-center text-gray-400 font-bold">
-                    ⚡ Energ
+                <div class="differential-card">
+                    <div class="card-number">07</div>
+                    <h4>Equipe Sênior</h4>
+                    <p>Profissionais com larga experiência e certificações internacionais</p>
                 </div>
-                <div class="text-center text-gray-400 font-bold">
-                    🏗️ Coge
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Localização Section -->
-    <section id="localizacao" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-                    Nossa Localização
-                </h2>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-8 items-center">
-                <!-- Mapa -->
-                <div class="rounded-lg overflow-hidden shadow-lg h-96">
-                    <iframe 
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3661.9245267656516!2d-46.999999!3d-22.68!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94c7ef6c0000000%3A0x0!2sJaguariuna%2C%20State%20of%20S%C3%A3o%20Paulo!5e0!3m2!1sen!2sbr!4v1234567890" 
-                        width="100%" 
-                        height="100%" 
-                        style="border:0;" 
-                        allowFullScreen="" 
-                        loading="lazy" 
-                        referrerPolicy="no-referrer-when-downgrade">
-                    </iframe>
-                </div>
-                
-                <!-- Informações -->
-                <div class="space-y-8">
-                    <div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-2">JSMC Soluções</h3>
-                        <p class="text-gray-600">Consultoria em Energia e Tecnologia</p>
-                    </div>
-                    
-                    <div>
-                        <h4 class="font-bold text-slate-900 mb-2">📍 Endereço</h4>
-                        <p class="text-gray-600">Jaguariúna, São Paulo<br>Brasil</p>
-                    </div>
-                    
-                    <div>
-                        <h4 class="font-bold text-slate-900 mb-2">📞 Contato</h4>
-                        <p class="text-gray-600">Telefone/WhatsApp disponível</p>
-                    </div>
-                    
-                    <div>
-                        <h4 class="font-bold text-slate-900 mb-2">🕒 Horário</h4>
-                        <p class="text-gray-600">Segunda a Sexta: 08:00 - 18:00<br>
-                        (Horário de Brasília)</p>
-                    </div>
-                    
-                    <div>
-                        <h4 class="font-bold text-slate-900 mb-2">✉️ Email</h4>
-                        <p class="text-gray-600">contato@jsmc.com.br</p>
-                    </div>
+                <div class="differential-card">
+                    <div class="card-number">08</div>
+                    <h4>ROI Comprovado</h4>
+                    <p>Retorno do investimento mensurável e documentado</p>
                 </div>
             </div>
         </div>
     </section>
-    
-    <!-- Contato Section -->
-    <section id="contato" class="py-20 bg-gray-50">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-                    🤝 Solicite sua Consultoria
-                </h2>
-                <p class="text-xl text-gray-600">
-                    Preencha o formulário abaixo e entraremos em contato
-                </p>
+
+    <!-- Clients Section -->
+    <section id="clients" class="clients">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nossos Clientes</h2>
+                <div class="header-line"></div>
+                <p class="section-subtitle">Confiança de líderes do setor energético brasileiro</p>
             </div>
-            
-            <form id="contact-form" class="bg-white rounded-lg p-8 shadow-lg">
-                <div class="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label for="nome" class="block text-sm font-semibold text-slate-900 mb-2">
-                            Nome Completo <span class="text-red-500">*</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="nome" 
-                            name="nome" 
-                            required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
-                            placeholder="Seu nome"
-                        >
-                    </div>
-                    
-                    <div>
-                        <label for="email" class="block text-sm font-semibold text-slate-900 mb-2">
-                            Email <span class="text-red-500">*</span>
-                        </label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
-                            placeholder="seu@email.com"
-                        >
-                    </div>
+            <div class="clients-grid">
+                <div class="client-logo">
+                    <img src="https://waxsol.com.br/wp-content/uploads/2020/11/logo-waxsol.png" alt="Waxsol">
                 </div>
-                
-                <div class="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label for="empresa" class="block text-sm font-semibold text-slate-900 mb-2">
-                            Empresa <span class="text-red-500">*</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="empresa" 
-                            name="empresa" 
-                            required
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
-                            placeholder="Nome da empresa"
-                        >
-                    </div>
-                    
-                    <div>
-                        <label for="telefone" class="block text-sm font-semibold text-slate-900 mb-2">
-                            Telefone
-                        </label>
-                        <input 
-                            type="tel" 
-                            id="telefone" 
-                            name="telefone"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
-                            placeholder="(11) 9XXXX-XXXX"
-                        >
-                    </div>
+                <div class="client-logo">
+                    <img src="https://fitec.com.br/static/images/logo.png" alt="FITec">
                 </div>
-                
-                <div class="mb-6">
-                    <label for="mensagem" class="block text-sm font-semibold text-slate-900 mb-2">
-                        Mensagem <span class="text-red-500">*</span>
-                    </label>
-                    <textarea 
-                        id="mensagem" 
-                        name="mensagem" 
-                        required
-                        rows="6"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
-                        placeholder="Descreva sua necessidade de consultoria..."
-                    ></textarea>
+                <div class="client-logo">
+                    <img src="https://www.enelamericas.com/content/dam/enel-americas/images/logos/enel-brasil-logo.png" alt="Enel">
                 </div>
-                
-                <div class="flex items-center mb-6">
-                    <input 
-                        type="checkbox" 
-                        id="termos" 
-                        name="termos" 
-                        required
-                        class="w-4 h-4 text-amber-400 rounded focus:ring-2 focus:ring-amber-100"
-                    >
-                    <label for="termos" class="ml-3 text-sm text-gray-600">
-                        Concordo em receber informações sobre consultoria
-                    </label>
+                <div class="client-logo">
+                    <img src="https://www.hughes.com/sites/default/files/2021-04/hughes-logo-rgb.png" alt="Hughes Brasil">
                 </div>
-                
-                <button 
-                    type="submit"
-                    class="w-full btn-amber text-white py-3 rounded-lg font-bold text-lg hover:shadow-xl"
-                >
-                    Enviar Consultoria →
-                </button>
-                
-                <div id="form-message" class="mt-4 text-center"></div>
-            </form>
+                <div class="client-logo">
+                    <img src="https://www.ufg.br/up/1/o/Logo_UFG_horizontal.png" alt="UFG">
+                </div>
+                <div class="client-logo">
+                    <img src="https://www.lactec.org.br/wp-content/uploads/2019/10/logo_lactec.png" alt="Lactec">
+                </div>
+                <div class="client-logo">
+                    <img src="https://www.equatorialenergia.com.br/images/logo-equatorial.png" alt="Equatorial">
+                </div>
+                <div class="client-logo">
+                    <img src="https://images.ctfassets.net/1z6dglnmpzym/2vv0z2Pli4YuAsqCesk2K6/eb90c02b8263a48aefeb6c1fccbcc94f/brasil-biofuels.png" alt="Brasil Biofuels">
+                </div>
+                <div class="client-logo">
+                    <img src="https://www.castecnologia.com.br/images/logo.png" alt="CAS Tecnologia">
+                </div>
+                <div class="client-logo">
+                    <img src="https://www.energisa.com.br/wps/wcm/connect/89e9f480-10b0-4dcc-8c45-f63fdf89f0dd/logo-energisa.png" alt="Energisa">
+                </div>
+                <div class="client-logo">
+                    <img src="https://www.copel.com/hpcopel/root/nivel2/telecom/logo.png" alt="Copel Telecom">
+                </div>
+                <div class="client-logo">
+                    <img src="https://www.jhsf.com.br/media/logo-jhsf.png" alt="JHSF">
+                </div>
+            </div>
         </div>
     </section>
-    
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Entre em Contato</h2>
+                <div class="header-line"></div>
+                <p class="section-subtitle">Vamos conversar sobre suas necessidades em energia</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="30" r="28" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                                <path d="M20,20 L30,30 L40,20" stroke="#FF8C42" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                                <path d="M20,20 L20,40 Q30,45 40,40 L40,20" stroke="#00A3D9" stroke-width="2" fill="none"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Email</h4>
+                            <p><a href="mailto:informações@jsmc.com.br">informações@jsmc.com.br</a></p>
+                            <p><a href="mailto:joao.souza@jsmc.com.br">joao.souza@jsmc.com.br</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="30" r="28" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                                <path d="M30,18 C30,18 22,24 22,31 C22,38 30,45 30,45 C30,45 38,38 38,31 C38,24 30,18 30,18 Z" fill="none" stroke="#FF8C42" stroke-width="2"/>
+                                <circle cx="30" cy="31" r="3" fill="#00A3D9"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Localização</h4>
+                            <p>Rio Claro - SP</p>
+                            <p>Brasil</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="30" cy="30" r="28" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                                <path d="M18,25 Q30,35 42,25" fill="none" stroke="#FF8C42" stroke-width="2" stroke-linecap="round"/>
+                                <rect x="18" y="28" width="24" height="12" rx="1" fill="none" stroke="#00A3D9" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4>Telefone</h4>
+                            <p><a href="tel:+5511920029999">+55 11 92002-9999</a></p>
+                            <p><a href="tel:+5511991940590">(11) 99194-0590</a></p>
+                        </div>
+                    </div>
+                </div>
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Nome Completo</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Empresa</label>
+                        <input type="text" id="company" name="company">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Assunto</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">Selecione um assunto</option>
+                            <option value="consultoria">Consultoria em Energia</option>
+                            <option value="iot">Projetos IoT</option>
+                            <option value="grid">Grid Modernization</option>
+                            <option value="regulatory">Assuntos Regulatórios</option>
+                            <option value="pdi">Pesquisa & Inovação</option>
+                            <option value="other">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensagem</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
-    <footer class="bg-slate-900 text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <h4 class="font-bold mb-4">JSMC Soluções</h4>
-                    <p class="text-gray-300 text-sm">
-                        Consultoria especializada em energia e tecnologia
-                    </p>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>JSMC Soluções</h4>
+                    <p>Gestão de Negócios - Consultoria em Energia</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 10h-3v8h-2v-8h-2v-2h2V9c0-2.21 1.13-3.5 3.41-3.5 1.04 0 1.94.08 2.2.12v2.55h-1.51c-1.18 0-1.41.56-1.41 1.39v1.83h2.83l-.29 2.61z" fill="#00A3D9"/>
+                            </svg>
+                        </a>
+                        <a href="#" aria-label="LinkedIn">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM8.5 15.5h-1.5v-6h1.5v6zM7.75 8.5c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75zm8.25 7c0 .41-.34.75-.75.75h-1.5v-2.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v2.5h-1.5v-6h1.5v.75c.44-.67 1.33-1.25 2.5-1.25 1.93 0 3.25 1.57 3.25 3.5v3z" fill="#00A3D9"/>
+                            </svg>
+                        </a>
+                    </div>
                 </div>
-                
-                <div>
-                    <h4 class="font-bold mb-4">Links Rápidos</h4>
-                    <ul class="space-y-2 text-sm text-gray-300">
-                        <li><a href="#servicos" class="hover:text-amber-400">Serviços</a></li>
-                        <li><a href="#diferenciais" class="hover:text-amber-400">Diferenciais</a></li>
-                        <li><a href="#localizacao" class="hover:text-amber-400">Localização</a></li>
-                        <li><a href="#contato" class="hover:text-amber-400">Contato</a></li>
+                <div class="footer-section">
+                    <h4>Navegação</h4>
+                    <ul>
+                        <li><a href="#home">Início</a></li>
+                        <li><a href="#about">Sobre</a></li>
+                        <li><a href="#services">Serviços</a></li>
+                        <li><a href="#contact">Contato</a></li>
                     </ul>
                 </div>
-                
-                <div>
-                    <h4 class="font-bold mb-4">Contato</h4>
-                    <ul class="space-y-2 text-sm text-gray-300">
-                        <li>📧 contato@jsmc.com.br</li>
-                        <li>📍 Jaguariúna, SP</li>
-                        <li>🕒 Seg-Sex 08:00-18:00</li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="font-bold mb-4">Redes Sociais</h4>
-                    <ul class="space-y-2 text-sm text-gray-300">
-                        <li><a href="#" class="hover:text-amber-400">LinkedIn</a></li>
-                        <li><a href="#" class="hover:text-amber-400">WhatsApp</a></li>
-                        <li><a href="#" class="hover:text-amber-400">GitHub</a></li>
-                    </ul>
+                <div class="footer-section">
+                    <h4>Contato Direto</h4>
+                    <p>João de Souza<br>Diretor Executivo<br><a href="tel:+5511991940590">(11) 99194-0590</a></p>
+                    <p>Fagner Silva<br>Tecnologia & Projetos<br><a href="tel:+552199254456">(21) 99254-456</a></p>
                 </div>
             </div>
-            
-            <div class="border-t border-gray-700 pt-8 text-center text-sm text-gray-300">
-                <p>© 2024 JSMC Soluções. Todos os direitos reservados.</p>
-                <p class="mt-2">Desenvolvido com ❤️ para o setor energético</p>
+            <div class="footer-bottom">
+                <p>&copy; 2025 JSMC Soluções. Todos os direitos reservados.</p>
+                <p><a href="https://jsmc.com.br">jsmc.com.br</a></p>
             </div>
         </div>
     </footer>
-    
-    <!-- Scripts -->
-    <script>
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-        });
-        
-        // Fechar menu ao clicar em link
-        document.querySelectorAll('#mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-            });
-        });
-        
-        // Form Submission
-        const contactForm = document.getElementById('contact-form');
-        const formMessage = document.getElementById('form-message');
-        
-        contactForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            // Validação
-            const nome = document.getElementById('nome').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const empresa = document.getElementById('empresa').value.trim();
-            const mensagem = document.getElementById('mensagem').value.trim();
-            
-            if (!nome || !email || !empresa || !mensagem) {
-                formMessage.innerHTML = '<p class="text-red-500">Por favor, preencha todos os campos obrigatórios.</p>';
-                return;
-            }
-            
-            // Validar email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                formMessage.innerHTML = '<p class="text-red-500">Por favor, insira um email válido.</p>';
-                return;
-            }
-            
-            // Mostrar mensagem de carregamento
-            formMessage.innerHTML = '<p class="text-blue-500">Enviando...</p>';
-            
-            try {
-                // Enviar para API
-                const response = await fetch('/api/contact', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        nome,
-                        email,
-                        empresa,
-                        telefone: document.getElementById('telefone').value.trim(),
-                        mensagem
-                    })
-                });
-                
-                if (response.ok) {
-                    formMessage.innerHTML = '<p class="text-green-500 font-semibold">✅ Mensagem enviada com sucesso! Entraremos em contato em breve.</p>';
-                    contactForm.reset();
-                    
-                    // Limpar mensagem após 5 segundos
-                    setTimeout(() => {
-                        formMessage.innerHTML = '';
-                    }, 5000);
-                } else {
-                    formMessage.innerHTML = '<p class="text-red-500">Erro ao enviar. Tente novamente ou entre em contato diretamente.</p>';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                formMessage.innerHTML = '<p class="text-red-500">Erro na conexão. Tente novamente.</p>';
-            }
-        });
-        
-        // Smooth Scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                const href = this.getAttribute('href');
-                if (href === '#') return;
-                
-                const target = document.querySelector(href);
-                if (target) {
-                    e.preventDefault();
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
+
+    <script src="js/main.js" defer></script>
 </body>
 </html>
