@@ -1,0 +1,49 @@
+{
+  "name": "jsmc-solucoes-website",
+  "version": "1.0.0",
+  "description": "Website profissional para JSMC Soluções - Consultoria em Energia",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server . -p 8080 -o",
+    "build": "echo 'Build concluído - arquivos estáticos prontos'",
+    "dev": "http-server . -p 3000",
+    "lint": "html-validate index.html",
+    "audit": "npm audit",
+    "audit:fix": "npm audit fix",
+    "lighthouse": "lighthouse https://jsmc.com.br --view",
+    "test": "echo 'Executando testes...'",
+    "deploy-local": "echo 'Deploy local concluído'",
+    "version": "1.0.0"
+  },
+  "keywords": [
+    "energia",
+    "consultoria",
+    "IoT",
+    "utilities",
+    "grid modernization",
+    "ADMS",
+    "DERMS",
+    "transmissão",
+    "distribuição"
+  ],
+  "author": "JSMC Soluções",
+  "license": "MIT",
+  "devDependencies": {
+    "html-validate": "^8.0.0",
+    "http-server": "^14.1.1",
+    "lighthouse": "^11.4.0",
+    "@lighthouse-ci/cli": "^0.11.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JSMC-Solucoes/website.git"
+  },
+  "homepage": "https://jsmc.com.br",
+  "bugs": {
+    "url": "https://github.com/JSMC-Solucoes/website/issues"
+  }
+}

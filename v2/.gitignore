@@ -1,0 +1,84 @@
+# ==================== NODE & NPM ====================
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ==================== BUILD & DIST ====================
+dist/
+build/
+*.bundle.js
+.cache/
+.next/
+out/
+
+# ==================== ENVIRONMENT ====================
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ==================== IDE & EDITOR ====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.classpath
+*.sublime-workspace
+.sublime-project
+.emacs_backup
+
+# ==================== OS ====================
+Thumbs.db
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ==================== TESTING ====================
+coverage/
+.nyc_output/
+.jest/
+test-results/
+junit.xml
+
+# ==================== AWS & DEPLOYMENT ====================
+.aws/
+sam-tests/
+.cloudformation/
+cfn-lint/
+
+# ==================== LOGS ====================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==================== TEMPORARY ====================
+tmp/
+temp/
+*.tmp
+.gitkeep
+.versionrc.json
+
+# ==================== SENSITIVE ====================
+*.pem
+*.key
+*.pub
+secrets.json
+credentials.json
+
+# ==================== LIGHTHOUSE ====================
+.lighthouseci/
+
+# ==================== DOCUMENTATION ====================
+.hugo_build/

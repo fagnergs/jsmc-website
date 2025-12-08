@@ -1,0 +1,234 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: 'JSMC Soluções - Website Hosting Infrastructure on AWS'
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: jsmc.com.br
+    Description: Domain name for the website
+  
+  CertificateArn:
+    Type: String
+    Description: ARN do certificado ACM (HTTPS automático)
+  
+  GitHubRepo:
+    Type: String
+    Default: JSMC-Solucoes/website
+    Description: GitHub repository for CI/CD
+
+Outputs:
+  S3BucketName:
+    Description: S3 bucket para armazenar website
+    Value: !Ref WebsiteBucket
+  
+  CloudFrontDistributionId:
+    Description: CloudFront Distribution ID
+    Value: !Ref CloudFrontDistribution
+  
+  CloudFrontDomainName:
+    Description: CloudFront domain name
+    Value: !GetAtt CloudFrontDistribution.DomainName
+  
+  WebsiteURL:
+    Description: Website URL
+    Value: !Sub 'https://${DomainName}'
+
+Resources:
+  # ==================== S3 BUCKET ====================
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'jsmc-website-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: JSMC Website Bucket
+        - Key: Project
+          Value: JSMC Soluções
+
+  # ==================== S3 BUCKET POLICY ====================
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      PolicyText:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontAccess
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${WebsiteBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                'AWS:SourceArn': !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+
+  # ==================== CLOUDFRONT ORIGIN ACCESS CONTROL ====================
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: JSMC-Website-OAC
+        OriginAccessControlType: s3
+        SignBehavior: sign-requests
+
+  # ==================== CLOUDFRONT DISTRIBUTION ====================
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn: WebsiteBucket
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: JSMC Soluções Website Distribution
+        DefaultRootObject: index.html
+        
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt WebsiteBucket.RegionalDomainName
+            S3OriginConfig: {}
+            OriginAccessControlId: !GetAtt CloudFrontOAC.Id
+
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # Managed-CachingOptimized
+          
+        CacheBehaviors:
+          # HTML files - short cache (1 hour)
+          - PathPattern: '*.html'
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD, OPTIONS]
+            CachedMethods: [GET, HEAD]
+            Compress: true
+            CachePolicyId: 4135ea3d-c35d-46eb-81d7-refd282e4197  # Managed-CachingDisabled
+            OriginRequestPolicyId: 216adef5-5c7f-47e4-b989-5492eafa07d3  # Managed-AllViewerExceptHostHeader
+          
+          # JS and CSS - long cache (1 year)
+          - PathPattern: '*.js'
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD, OPTIONS]
+            CachedMethods: [GET, HEAD]
+            Compress: true
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+
+          - PathPattern: '*.css'
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD, OPTIONS]
+            CachedMethods: [GET, HEAD]
+            Compress: true
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+
+        Aliases:
+          - !Ref DomainName
+          - !Sub 'www.${DomainName}'
+
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 300
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /404.html
+            ErrorCachingMinTTL: 300
+
+        HttpVersion: http2and3
+        PriceClass: PriceClass_All
+
+        Tags:
+          - Key: Name
+            Value: JSMC Website CloudFront
+          - Key: Project
+            Value: JSMC Soluções
+
+  # ==================== IAM ROLE PARA GITHUB ACTIONS ====================
+  GitHubActionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub 'arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com'
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                'token.actions.githubusercontent.com:aud': sts.amazonaws.com
+              StringLike:
+                'token.actions.githubusercontent.com:sub': !Sub 'repo:${GitHubRepo}:*'
+      
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudFrontFullAccess
+      
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt WebsiteBucket.Arn
+                  - !Sub '${WebsiteBucket.Arn}/*'
+        
+        - PolicyName: CloudFrontInvalidation
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                  - cloudfront:GetInvalidation
+                Resource: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+
+  # ==================== CLOUDWATCH LOG GROUP ====================
+  WebsiteLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/jsmc-website
+      RetentionInDays: 30
+
+  # ==================== BUDGET ALERT ====================
+  WebsiteBudget:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetName: JSMC-Website-Budget
+        BudgetLimit:
+          Amount: 50
+          Unit: USD
+        TimeUnit: MONTHLY
+        BudgetType: COST
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 80
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: informacoes@jsmc.com.br
