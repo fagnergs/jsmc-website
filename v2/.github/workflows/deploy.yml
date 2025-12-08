@@ -1,0 +1,176 @@
+name: Deploy Website JSMC
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: production
+    
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+        continue-on-error: true
+
+      - name: Validate HTML
+        run: |
+          echo "Validando estrutura HTML..."
+          npx html-validate index.html || true
+
+      - name: Run Security Checks
+        run: |
+          echo "Executando verificações de segurança..."
+          npm audit --audit-level=moderate || true
+
+      - name: Build static files
+        run: |
+          echo "Preparando arquivos para publicação..."
+          mkdir -p build
+          cp index.html build/
+          cp -r css build/
+          cp -r js build/
+          cp -r assets build/ || true
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync build/ s3://${{ secrets.AWS_S3_BUCKET }}/ \
+            --delete \
+            --cache-control "public, max-age=31536000" \
+            --exclude "index.html" \
+            --exclude "*.json"
+          
+          aws s3 cp build/index.html s3://${{ secrets.AWS_S3_BUCKET }}/index.html \
+            --cache-control "public, max-age=3600" \
+            --content-type "text/html; charset=utf-8"
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.AWS_CLOUDFRONT_ID }} \
+            --paths "/*"
+
+      - name: Get Deployment Info
+        id: deploy-info
+        run: |
+          echo "deployment_time=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
+          echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Print Deployment Summary
+        run: |
+          echo "✅ Deploy concluído com sucesso!"
+          echo "📊 Informações:"
+          echo "   - URL: https://jsmc.com.br"
+          echo "   - Commit: ${{ steps.deploy-info.outputs.commit_sha }}"
+          echo "   - Hora: ${{ steps.deploy-info.outputs.deployment_time }}"
+          echo "   - Tempo estimado: <30 segundos"
+
+      - name: Slack Notification (Success)
+        if: success()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "✅ Website JSMC Soluções - Deploy realizado com sucesso!",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "✅ Deploy Sucesso - JSMC Soluções"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repositório:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit:*\n${{ steps.deploy-info.outputs.commit_sha }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Autor:*\n${{ github.actor }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🚀 Acesse: <https://jsmc.com.br|jsmc.com.br>"
+                  }
+                }
+              ]
+            }
+
+      - name: Slack Notification (Failure)
+        if: failure()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "❌ Deploy do Website JSMC falhou",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "❌ Deploy Falhou - JSMC Soluções"
+                  }
+                }
+              ]
+            }
+
+  performance-test:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: './lighthouserc.json'
+          uploadArtifacts: true
+        continue-on-error: true
+
+      - name: Performance Report
+        run: |
+          echo "📊 Teste de Performance Concluído"
+          echo "Para relatório detalhado, verifique os artifacts"

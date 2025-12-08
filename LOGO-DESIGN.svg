@@ -1,0 +1,137 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="energyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00A3D9;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0088B8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C42;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="white" stroke="url(#energyGrad)" stroke-width="2" opacity="0.1"/>
+
+  <!-- Símbolo Principal: Torre de Transmissão Estilizada + Letras J-S-M-C -->
+  
+  <!-- Torre central (simbolo de energia) -->
+  <g id="tower">
+    <!-- Vertical principal -->
+    <line x1="100" y1="40" x2="100" y2="140" stroke="url(#energyGrad)" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Linhas de transmissão (relâmpago/energia) -->
+    <path d="M 85 70 L 100 85 L 85 100" stroke="url(#energyGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 115 70 L 100 85 L 115 100" stroke="url(#energyGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Plataformas (conexões) -->
+    <circle cx="100" cy="70" r="4" fill="url(#energyGrad)" filter="url(#glow)"/>
+    <circle cx="100" cy="100" r="4" fill="url(#energyGrad)" filter="url(#glow)"/>
+    <circle cx="100" cy="130" r="4" fill="url(#energyGrad)" filter="url(#glow)"/>
+  </g>
+
+  <!-- Letras ao redor -->
+  <g id="letters">
+    <!-- Circular text arrangement -->
+    
+    <!-- J (top-left) -->
+    <text x="30" y="95" font-family="Poppins, Arial" font-size="24" font-weight="700" fill="#2C3E50" text-anchor="start">J</text>
+    
+    <!-- S (top-right) -->
+    <text x="150" y="95" font-family="Poppins, Arial" font-size="24" font-weight="700" fill="#FF8C42" text-anchor="end">S</text>
+    
+    <!-- M (bottom-right) -->
+    <text x="150" y="125" font-family="Poppins, Arial" font-size="24" font-weight="700" fill="#00A3D9" text-anchor="end">M</text>
+    
+    <!-- C (bottom-left) -->
+    <text x="30" y="125" font-family="Poppins, Arial" font-size="24" font-weight="700" fill="#2C3E50" text-anchor="start">C</text>
+  </g>
+
+  <!-- Efeito de energia (pontos circulares) -->
+  <g id="energy-dots" opacity="0.6">
+    <circle cx="70" cy="100" r="2" fill="#FF8C42" filter="url(#glow)"/>
+    <circle cx="130" cy="100" r="2" fill="#00A3D9" filter="url(#glow)"/>
+    <circle cx="100" cy="50" r="2" fill="#FF8C42" filter="url(#glow)"/>
+    <circle cx="100" cy="150" r="2" fill="#00A3D9" filter="url(#glow)"/>
+  </g>
+
+  <!-- Linhas conectoras -->
+  <g id="connections" stroke="url(#energyGrad)" stroke-width="1" opacity="0.3" stroke-linecap="round">
+    <line x1="75" y1="85" x2="100" y2="70"/>
+    <line x1="125" y1="85" x2="100" y2="70"/>
+    <line x1="75" y1="115" x2="100" y2="130"/>
+    <line x1="125" y1="115" x2="100" y2="130"/>
+  </g>
+</svg>
+
+<!-- 
+ALTERNATIVA: Logo com design minimalista (mais moderno)
+
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="modern" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00A3D9"/>
+      <stop offset="100%" style="stop-color:#FF8C42"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Símbolo de conexão/energia -->
+  <circle cx="100" cy="100" r="90" fill="none" stroke="url(#modern)" stroke-width="1.5" opacity="0.2"/>
+  
+  <!-- Triângulo/relâmpago estilizado -->
+  <path d="M 100 50 L 130 110 L 115 110 L 140 160 L 85 100 L 100 100 Z" fill="url(#modern)" opacity="0.9"/>
+  
+  <!-- Texto em arco -->
+  <defs>
+    <path id="arc" d="M 50,100 A 50,50 0 0,1 150,100" fill="none"/>
+  </defs>
+  
+  <text font-family="Poppins" font-size="16" font-weight="700" fill="#2C3E50">
+    <textPath href="#arc" startOffset="50%" text-anchor="middle">
+      JSMC SOLUÇÕES
+    </textPath>
+  </text>
+</svg>
+-->
+
+<!-- ============================================
+   GUIA DE USO DO LOGO
+   ============================================
+   
+1. TAMANHO RECOMENDADO:
+   - Navbar: 100-120px de largura
+   - Hero section: 150-200px
+   - Footer: 80-100px
+   
+2. VERSÕES:
+   - Colorida (padrão) - usar em fundos claros
+   - Branca - usar em fundos escuros
+   - Monocromática - documentos impressos
+   
+3. ESPAÇO MÍNIMO (CLEARANCE):
+   - Deixe 10-15px de espaço ao redor
+   - Não coloque outros elementos muito perto
+   
+4. VARIAÇÕES:
+   - Com texto "JSMC SOLUÇÕES"
+   - Apenas símbolo (para favicon)
+   - Versão horizontal
+
+5. APLICAÇÕES:
+   ✅ Website
+   ✅ Apresentações
+   ✅ Email signatures
+   ✅ Redes sociais
+   ✅ Documentos oficiais
+   
+6. NÃO FAÇA:
+   ❌ Distorcer proporções
+   ❌ Mudar cores sem autorização
+   ❌ Adicionar sombras ou efeitos não aprovados
+   ❌ Usar logo muito pequeno (mínimo 80px)
+
+============================================ -->
