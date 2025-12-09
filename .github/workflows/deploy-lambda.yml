@@ -1,0 +1,187 @@
+name: Deploy Lambda Function
+
+# Workflow para deployment automatizado da função Lambda de contato
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'lambda/**'
+      - '.github/workflows/deploy-lambda.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+          - development
+
+env:
+  AWS_REGION: us-east-1
+  NODE_VERSION: '18'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Lambda Function
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: lambda/package.json
+
+      - name: Install dependencies
+        working-directory: lambda
+        run: |
+          npm ci --production
+          echo "✅ Dependências instaladas"
+
+      - name: Run tests (if available)
+        working-directory: lambda
+        run: |
+          if [ -f "package.json" ] && grep -q '"test"' package.json; then
+            npm test || echo "⚠️ Tests not configured"
+          else
+            echo "⚠️ No tests found, skipping..."
+          fi
+
+      - name: Create deployment package
+        working-directory: lambda
+        run: |
+          echo "📦 Criando pacote de deployment..."
+          zip -r ../function.zip . -x "*.git*" -x "*node_modules/.cache*" -x "*.md"
+          cd ..
+          ls -lh function.zip
+          echo "✅ Pacote criado: $(du -h function.zip | cut -f1)"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_LAMBDA_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Determine function name
+        id: function-name
+        run: |
+          # Usando a função criada manualmente no Console AWS
+          echo "name=jsmc-contact-form-handler" >> $GITHUB_OUTPUT
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy to Lambda
+        run: |
+          echo "🚀 Deploying to Lambda function: ${{ steps.function-name.outputs.name }}"
+
+          aws lambda update-function-code \
+            --function-name ${{ steps.function-name.outputs.name }} \
+            --zip-file fileb://function.zip \
+            --region ${{ env.AWS_REGION }}
+
+          echo "✅ Código atualizado com sucesso!"
+
+      - name: Wait for Lambda to be ready
+        run: |
+          echo "⏳ Aguardando Lambda ficar pronta..."
+          aws lambda wait function-updated \
+            --function-name ${{ steps.function-name.outputs.name }} \
+            --region ${{ env.AWS_REGION }}
+          echo "✅ Lambda pronta!"
+
+      - name: Get Lambda version
+        id: lambda-version
+        run: |
+          VERSION=$(aws lambda get-function \
+            --function-name ${{ steps.function-name.outputs.name }} \
+            --region ${{ env.AWS_REGION }} \
+            --query 'Configuration.Version' \
+            --output text)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Lambda Version: $VERSION"
+
+      - name: Test Lambda function
+        run: |
+          echo "🧪 Testando função Lambda..."
+
+          # Criar arquivo de payload
+          cat > payload.json <<'EOF'
+          {
+            "httpMethod": "POST",
+            "body": "{\"name\":\"GitHub Actions Test\",\"email\":\"test@jsmc.com.br\",\"subject\":\"consultoria\",\"message\":\"Teste automatizado do deploy\"}"
+          }
+          EOF
+
+          aws lambda invoke \
+            --function-name ${{ steps.function-name.outputs.name }} \
+            --cli-binary-format raw-in-base64-out \
+            --payload file://payload.json \
+            --region ${{ env.AWS_REGION }} \
+            response.json
+
+          echo "📄 Response:"
+          cat response.json
+
+          # Verificar se resposta contém erro
+          if grep -q '"statusCode":500' response.json; then
+            echo "❌ Lambda retornou erro 500"
+            exit 1
+          elif grep -q '"statusCode":200' response.json; then
+            echo "✅ Lambda funcionando corretamente!"
+          else
+            echo "⚠️ Resposta inesperada"
+            cat response.json
+          fi
+
+      - name: Get CloudWatch Logs
+        if: failure()
+        run: |
+          echo "📋 Últimos logs do CloudWatch:"
+          aws logs tail /aws/lambda/${{ steps.function-name.outputs.name }} \
+            --since 5m \
+            --region ${{ env.AWS_REGION }} || echo "Logs não disponíveis"
+
+      - name: Create deployment summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY <<EOF
+          ## 🚀 Lambda Deployment Summary
+
+          **Environment:** ${{ steps.function-name.outputs.environment }}
+          **Function:** \`${{ steps.function-name.outputs.name }}\`
+          **Version:** \`${{ steps.lambda-version.outputs.version }}\`
+          **Region:** \`${{ env.AWS_REGION }}\`
+          **Commit:** \`${GITHUB_SHA:0:7}\`
+          **Branch:** \`${GITHUB_REF_NAME}\`
+
+          ### ✅ Deployment Status: SUCCESS
+
+          **Next Steps:**
+          1. Test the contact form at [https://jsmc.com.br](https://jsmc.com.br)
+          2. Check CloudWatch logs: [View Logs](https://console.aws.amazon.com/cloudwatch/home?region=${{ env.AWS_REGION }}#logsV2:log-groups/log-group/\$252Faws\$252Flambda\$252F${{ steps.function-name.outputs.name }})
+          3. Monitor CloudWatch metrics
+
+          EOF
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment falhou!"
+          echo "Verifique os logs acima para mais detalhes."

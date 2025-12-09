@@ -51,40 +51,116 @@ document.querySelectorAll('.service-category, .differential-card, .client-logo, 
     observer.observe(el);
 });
 
-// ==================== FORM SUBMISSION ==================== 
+// ==================== FORM SUBMISSION ====================
+// IMPORTANTE: Definir API_ENDPOINT após deploy do CloudFormation
+// Exemplo: const API_ENDPOINT = 'https://xxxxx.execute-api.us-east-1.amazonaws.com/production/contact';
+const API_ENDPOINT = window.JSMC_CONFIG?.API_ENDPOINT || null;
+
 document.getElementById('contactForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+
+    // Desabilitar botão durante envio
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+    submitBtn.style.opacity = '0.7';
+
     const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        company: document.getElementById('company').value,
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        company: document.getElementById('company').value.trim(),
         subject: document.getElementById('subject').value,
-        message: document.getElementById('message').value
+        message: document.getElementById('message').value.trim()
     };
 
     try {
-        // Simular envio - em produção usar endpoint real
-        console.log('Formulário enviado:', formData);
-        
-        // Feedback visual
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = '✓ Mensagem enviada com sucesso!';
-        submitBtn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
-        
-        // Limpar formulário
-        this.reset();
-        
-        // Restaurar botão após 3 segundos
-        setTimeout(() => {
-            submitBtn.textContent = originalText;
-            submitBtn.style.background = '';
-        }, 3000);
+        // Verificar se API_ENDPOINT está configurado
+        if (!API_ENDPOINT) {
+            console.warn('API_ENDPOINT não configurado. Usando modo de demonstração.');
+            console.log('Dados do formulário:', formData);
+
+            // Simular delay de rede
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Feedback de sucesso (modo demo)
+            submitBtn.textContent = '✓ Mensagem enviada (demo)!';
+            submitBtn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            submitBtn.style.opacity = '1';
+
+            // Limpar formulário
+            this.reset();
+
+            // Restaurar botão após 3 segundos
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.style.background = '';
+                submitBtn.disabled = false;
+            }, 3000);
+
+            return;
+        }
+
+        // Enviar para API Gateway
+        const response = await fetch(API_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            // Sucesso
+            submitBtn.textContent = '✓ Mensagem enviada com sucesso!';
+            submitBtn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            submitBtn.style.opacity = '1';
+
+            // Limpar formulário
+            this.reset();
+
+            // Restaurar botão após 3 segundos
+            setTimeout(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.style.background = '';
+                submitBtn.disabled = false;
+            }, 3000);
+
+            // Log de sucesso (analytics)
+            console.log('Formulário enviado com sucesso:', {
+                timestamp: new Date().toISOString(),
+                subject: formData.subject
+            });
+
+        } else {
+            // Erro da API
+            throw new Error(result.message || 'Erro ao enviar mensagem');
+        }
 
     } catch (error) {
         console.error('Erro ao enviar formulário:', error);
-        alert('Erro ao enviar mensagem. Por favor, tente novamente.');
+
+        // Feedback de erro
+        submitBtn.textContent = '✗ Erro ao enviar. Tente novamente.';
+        submitBtn.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+        submitBtn.style.opacity = '1';
+
+        // Restaurar botão após 4 segundos
+        setTimeout(() => {
+            submitBtn.textContent = originalText;
+            submitBtn.style.background = '';
+            submitBtn.style.opacity = '1';
+            submitBtn.disabled = false;
+        }, 4000);
+
+        // Mostrar mensagem de erro amigável
+        alert('Desculpe, não foi possível enviar sua mensagem no momento.\n\n' +
+              'Por favor, tente novamente ou entre em contato diretamente:\n' +
+              'Email: informacoes@jsmc.com.br\n' +
+              'Telefone: +55 (11) 92002-9999');
     }
 });
 
