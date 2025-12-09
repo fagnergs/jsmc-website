@@ -9,8 +9,7 @@
 
 window.JSMC_CONFIG = {
     // API Gateway endpoint para formulário de contato
-    // Exemplo: 'https://abc123xyz.execute-api.us-east-1.amazonaws.com/production/contact'
-    API_ENDPOINT: null, // Substituir após deploy do CloudFormation
+    API_ENDPOINT: 'https://77iwfd87a3.execute-api.us-east-1.amazonaws.com/prod/contact',
 
     // Outras configurações podem ser adicionadas aqui
     ENVIRONMENT: 'production',
