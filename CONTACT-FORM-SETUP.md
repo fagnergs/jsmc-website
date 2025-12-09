@@ -496,14 +496,16 @@ Agora vamos criar a função Lambda que processa o formulário.
    Key: TO_EMAIL
    Value: informacoes@jsmc.com.br
 
-   Key: AWS_REGION
-   Value: us-east-1
-
    Key: ENVIRONMENT
    Value: production
 
 4. Clicar: "Save"
 ```
+
+**⚠️ IMPORTANTE:**
+- NÃO adicione `AWS_REGION` - é uma variável **reservada** pela AWS Lambda
+- A região já está automaticamente configurada como `us-east-1`
+- Se tentar adicionar, receberá erro: "reserved keys that are currently not supported for modification"
 
 ##### **Ajustar Configurações:**
 
