@@ -195,8 +195,10 @@ async function sendEmail(data) {
                     Charset: 'UTF-8'
                 }
             }
-        },
-        ReplyToAddresses: [data.email]
+        }
+        // ReplyToAddresses temporariamente comentado devido ao Sandbox SES
+        // Será reativado após aprovação de Production Access
+        // ReplyToAddresses: [data.email]
     };
 
     // Adicionar BCC se configurado
