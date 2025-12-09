@@ -531,6 +531,32 @@ Vamos configurar deploy automático pelo GitHub em vez de upload manual de ZIP.
 - ✅ Histórico completo de mudanças
 - ✅ Teste automático após deploy
 
+**Passo 0: Criar OIDC Provider (uma vez só)**
+
+⚠️ **IMPORTANTE:** Este passo é necessário apenas na primeira vez. Se já existe `token.actions.githubusercontent.com` em IAM > Identity providers, pule para o Passo 1.
+
+```bash
+1. AWS Console > IAM > Identity providers
+
+2. Clicar: "Add provider"
+
+3. Provider type: "OpenID Connect"
+
+4. Provider URL: https://token.actions.githubusercontent.com
+   (copiar exatamente como está)
+
+5. Clicar: "Get thumbprint"
+   (AWS busca automaticamente o certificado)
+
+6. Audience: sts.amazonaws.com
+
+7. Clicar: "Add provider"
+```
+
+✅ **Resultado:** Provider `token.actions.githubusercontent.com` criado e disponível para uso!
+
+---
+
 **Passo 1: Criar IAM Role para GitHub Actions**
 
 ```bash
@@ -539,7 +565,7 @@ Vamos configurar deploy automático pelo GitHub em vez de upload manual de ZIP.
 2. Trusted entity type: "Web identity"
 
 3. Identity provider:
-   - Provider: "token.actions.githubusercontent.com"
+   - Dropdown agora mostra: "token.actions.githubusercontent.com"
    - Audience: "sts.amazonaws.com"
 
 4. Clicar: "Next"
