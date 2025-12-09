@@ -1,0 +1,278 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Infraestrutura AWS para formulário de contato do website JSMC Soluções - Lambda + API Gateway + SES'
+
+Parameters:
+  FromEmail:
+    Type: String
+    Default: informacoes@jsmc.com.br
+    Description: 'Email remetente (deve estar verificado no SES)'
+    AllowedPattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+  ToEmail:
+    Type: String
+    Default: informacoes@jsmc.com.br
+    Description: 'Email destinatário para receber mensagens do formulário'
+    AllowedPattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+  BccEmail:
+    Type: String
+    Default: ''
+    Description: 'Email opcional para cópia oculta (deixe vazio se não quiser)'
+
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues:
+      - development
+      - staging
+      - production
+    Description: 'Ambiente de deployment'
+
+Resources:
+  # ==================== IAM ROLE PARA LAMBDA ====================
+  ContactFormLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'jsmc-contact-form-lambda-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: SESEmailSendingPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                Resource: '*'
+                Condition:
+                  StringEquals:
+                    ses:FromAddress: !Ref FromEmail
+
+  # ==================== LAMBDA FUNCTION ====================
+  ContactFormFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'jsmc-contact-form-handler-${Environment}'
+      Runtime: nodejs18.x
+      Handler: contact-form-handler.handler
+      Role: !GetAtt ContactFormLambdaRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      Environment:
+        Variables:
+          FROM_EMAIL: !Ref FromEmail
+          TO_EMAIL: !Ref ToEmail
+          BCC_EMAIL: !Ref BccEmail
+          AWS_REGION: !Ref AWS::Region
+          ENVIRONMENT: !Ref Environment
+      Code:
+        ZipFile: |
+          // Placeholder - Deploy real code via GitHub Actions ou AWS CLI
+          exports.handler = async (event) => {
+              return {
+                  statusCode: 200,
+                  body: JSON.stringify({ message: 'Deploy pending' })
+              };
+          };
+      Tags:
+        - Key: Project
+          Value: JSMC-Website
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ==================== LAMBDA LOG GROUP ====================
+  ContactFormLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/jsmc-contact-form-handler-${Environment}'
+      RetentionInDays: 30
+
+  # ==================== API GATEWAY REST API ====================
+  ContactFormAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub 'jsmc-contact-form-api-${Environment}'
+      Description: 'API Gateway para processar formulário de contato'
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # ==================== API GATEWAY RESOURCE ====================
+  ContactResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ContactFormAPI
+      ParentId: !GetAtt ContactFormAPI.RootResourceId
+      PathPart: contact
+
+  # ==================== API GATEWAY METHOD - OPTIONS (CORS) ====================
+  ContactOptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ContactFormAPI
+      ResourceId: !Ref ContactResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            ResponseTemplates:
+              application/json: ''
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # ==================== API GATEWAY METHOD - POST ====================
+  ContactPostMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ContactFormAPI
+      ResourceId: !Ref ContactResource
+      HttpMethod: POST
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ContactFormFunction.Arn}/invocations'
+        IntegrationResponses:
+          - StatusCode: 200
+      MethodResponses:
+        - StatusCode: 200
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # ==================== LAMBDA PERMISSION PARA API GATEWAY ====================
+  ContactFormLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ContactFormFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ContactFormAPI}/*/*/contact'
+
+  # ==================== API GATEWAY DEPLOYMENT ====================
+  ContactFormAPIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ContactPostMethod
+      - ContactOptionsMethod
+    Properties:
+      RestApiId: !Ref ContactFormAPI
+      Description: !Sub 'Deployment ${Environment}'
+
+  # ==================== API GATEWAY STAGE ====================
+  ContactFormAPIStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      RestApiId: !Ref ContactFormAPI
+      DeploymentId: !Ref ContactFormAPIDeployment
+      StageName: !Ref Environment
+      Description: !Sub 'Stage ${Environment} para Contact Form API'
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO
+          DataTraceEnabled: true
+          MetricsEnabled: true
+      Tags:
+        - Key: Project
+          Value: JSMC-Website
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ==================== CLOUDWATCH ALARM - LAMBDA ERRORS ====================
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub 'jsmc-contact-form-lambda-errors-${Environment}'
+      AlarmDescription: 'Alerta quando Lambda tem erros'
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref ContactFormFunction
+      TreatMissingData: notBreaching
+
+  # ==================== CLOUDWATCH ALARM - API GATEWAY 5XX ====================
+  APIGateway5XXAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub 'jsmc-contact-form-api-5xx-${Environment}'
+      AlarmDescription: 'Alerta quando API Gateway tem erros 5XX'
+      MetricName: 5XXError
+      Namespace: AWS/ApiGateway
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 10
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: ApiName
+          Value: !Ref ContactFormAPI
+      TreatMissingData: notBreaching
+
+# ==================== OUTPUTS ====================
+Outputs:
+  APIEndpoint:
+    Description: 'URL do API Gateway endpoint para o formulário de contato'
+    Value: !Sub 'https://${ContactFormAPI}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/contact'
+    Export:
+      Name: !Sub '${AWS::StackName}-APIEndpoint'
+
+  LambdaFunctionArn:
+    Description: 'ARN da função Lambda'
+    Value: !GetAtt ContactFormFunction.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaFunctionArn'
+
+  LambdaFunctionName:
+    Description: 'Nome da função Lambda'
+    Value: !Ref ContactFormFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaFunctionName'
+
+  APIGatewayId:
+    Description: 'ID do API Gateway'
+    Value: !Ref ContactFormAPI
+    Export:
+      Name: !Sub '${AWS::StackName}-APIGatewayId'
+
+  FromEmailAddress:
+    Description: 'Email remetente configurado'
+    Value: !Ref FromEmail
+
+  ToEmailAddress:
+    Description: 'Email destinatário configurado'
+    Value: !Ref ToEmail
+
+  SetupInstructions:
+    Description: 'Próximos passos'
+    Value: !Sub |
+      1. Verificar emails no AWS SES: ${FromEmail} e ${ToEmail}
+      2. Deploy do código Lambda via GitHub Actions ou AWS CLI
+      3. Configurar API_ENDPOINT no frontend: https://${ContactFormAPI}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/contact
+      4. Testar formulário de contato
