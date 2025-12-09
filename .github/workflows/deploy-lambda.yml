@@ -1,6 +1,6 @@
 name: Deploy Lambda Function
 
-# Workflow para deployment automatizado da função Lambda
+# Workflow para deployment automatizado da função Lambda de contato
 on:
   push:
     branches:
