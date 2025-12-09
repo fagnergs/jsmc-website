@@ -363,93 +363,424 @@ Ferramenta: https://www.autospf.com/
 
 ---
 
-### **Passo 2: Deploy da Infraestrutura AWS**
+### **Passo 2: Criar Infraestrutura AWS (Manual via Console)**
 
-⏱️ Tempo estimado: 15 minutos
+⏱️ Tempo estimado: 30-40 minutos
 
-Deploy do CloudFormation stack que cria Lambda, API Gateway, IAM Roles, etc.
+Vamos criar todos os componentes manualmente via AWS Console. Isto dá maior controle e entendimento de cada peça.
 
-```bash
-# 1. Navegar para o diretório do projeto
-cd /caminho/para/jsmc-website
-
-# 2. Deploy via AWS CLI
-aws cloudformation create-stack \
-  --stack-name jsmc-contact-form-stack \
-  --template-body file://aws-contact-form-infrastructure.yaml \
-  --parameters \
-      ParameterKey=FromEmail,ParameterValue=informacoes@jsmc.com.br \
-      ParameterKey=ToEmail,ParameterValue=informacoes@jsmc.com.br \
-      ParameterKey=Environment,ParameterValue=production \
-  --capabilities CAPABILITY_NAMED_IAM \
-  --region us-east-1
-
-# 3. Aguardar conclusão (5-10 minutos)
-aws cloudformation wait stack-create-complete \
-  --stack-name jsmc-contact-form-stack \
-  --region us-east-1
-
-# 4. Obter outputs do stack
-aws cloudformation describe-stacks \
-  --stack-name jsmc-contact-form-stack \
-  --region us-east-1 \
-  --query 'Stacks[0].Outputs' \
-  --output table
-```
-
-**Outputs importantes:**
-- `APIEndpoint`: URL do API Gateway (exemplo: https://abc123.execute-api.us-east-1.amazonaws.com/production/contact)
-- `LambdaFunctionName`: Nome da função Lambda
-
-**Copie o valor de APIEndpoint**, você vai precisar no Passo 4!
+**Ordem de criação:**
+1. IAM Role para Lambda
+2. Lambda Function
+3. API Gateway
+4. Testar integração
 
 ---
 
-### **Passo 3: Deploy do Código Lambda**
+#### **2.1. Criar IAM Role para Lambda**
+
+A Lambda precisa de permissões para enviar emails via SES e escrever logs.
+
+##### **Passo-a-Passo:**
+
+```bash
+1. Acessar IAM Console:
+   https://console.aws.amazon.com/iam/
+
+2. Menu lateral: "Roles" > "Create role"
+
+3. Trusted entity type: "AWS service"
+   Use case: "Lambda"
+   Clicar: "Next"
+
+4. Add permissions - Selecionar políticas:
+   ☑️ AWSLambdaBasicExecutionRole
+   (Permite escrever logs no CloudWatch)
+
+5. Clicar: "Next"
+
+6. Role details:
+   Role name: jsmc-contact-form-lambda-role
+   Description: "Permite Lambda enviar emails via SES e escrever logs"
+
+7. Clicar: "Create role"
+```
+
+##### **Adicionar Permissão SES:**
+
+A política `AWSLambdaBasicExecutionRole` só dá acesso a logs. Precisamos adicionar SES.
+
+```bash
+1. Na lista de Roles, clicar em: jsmc-contact-form-lambda-role
+
+2. Aba "Permissions" > "Add permissions" > "Create inline policy"
+
+3. Clicar aba "JSON" e colar:
+```
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ses:SendEmail",
+        "ses:SendRawEmail"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ses:FromAddress": "noreply@jsmc.com.br"
+        }
+      }
+    }
+  ]
+}
+```
+
+```bash
+4. Clicar: "Next"
+
+5. Policy name: SESEmailSendingPolicy
+
+6. Clicar: "Create policy"
+```
+
+✅ **Resultado:** Role criada com ARN parecido com:
+```
+arn:aws:iam::123456789012:role/jsmc-contact-form-lambda-role
+```
+
+---
+
+#### **2.2. Criar Lambda Function**
+
+Agora vamos criar a função Lambda que processa o formulário.
+
+##### **Passo-a-Passo:**
+
+```bash
+1. Acessar Lambda Console:
+   https://console.aws.amazon.com/lambda/
+
+2. Clicar: "Create function"
+
+3. Selecionar: "Author from scratch"
+
+4. Function name: jsmc-contact-form-handler
+
+5. Runtime: Node.js 18.x
+
+6. Architecture: x86_64
+
+7. Permissions:
+   ☑️ "Use an existing role"
+   Existing role: jsmc-contact-form-lambda-role
+
+8. Clicar: "Create function"
+```
+
+##### **Configurar Variáveis de Ambiente:**
+
+```bash
+1. Na página da função, aba "Configuration"
+
+2. Menu lateral: "Environment variables" > "Edit"
+
+3. Adicionar variáveis:
+
+   Key: FROM_EMAIL
+   Value: noreply@jsmc.com.br
+
+   Key: TO_EMAIL
+   Value: informacoes@jsmc.com.br
+
+   Key: AWS_REGION
+   Value: us-east-1
+
+   Key: ENVIRONMENT
+   Value: production
+
+4. Clicar: "Save"
+```
+
+##### **Ajustar Configurações:**
+
+```bash
+1. Aba "Configuration" > "General configuration" > "Edit"
+
+2. Timeout: 30 segundos
+   (padrão é 3s, pode ser pouco para SES)
+
+3. Memory: 256 MB
+   (suficiente para envio de emails)
+
+4. Clicar: "Save"
+```
+
+##### **Upload do Código:**
+
+```bash
+1. Aba "Code" > Code source
+
+2. Opção A - Upload via ZIP (RECOMENDADO):
+
+   a. No seu computador, preparar código:
+      cd /caminho/para/jsmc-website/lambda
+      npm install
+      zip -r function.zip .
+
+   b. No Console Lambda:
+      - Clicar: "Upload from" > ".zip file"
+      - Selecionar: function.zip
+      - Clicar: "Save"
+
+3. Opção B - Copiar/Colar código diretamente:
+
+   a. Abrir arquivo: lambda/contact-form-handler.js
+   b. Copiar TODO o conteúdo
+   c. No Console Lambda > Code source
+   d. Criar arquivo: contact-form-handler.js
+   e. Colar código
+   f. Clicar: "Deploy"
+
+   NOTA: Esta opção não instala dependências (aws-sdk).
+   Só funciona porque aws-sdk já vem incluído no runtime Node.js 18
+
+4. Clicar: "Deploy" (botão laranja no topo)
+```
+
+##### **Testar Lambda (Opcional):**
+
+```bash
+1. Aba "Test" > "Create new test event"
+
+2. Event name: ContactFormTest
+
+3. Event JSON:
+```
+
+```json
+{
+  "httpMethod": "POST",
+  "body": "{\"name\":\"Teste Lambda\",\"email\":\"fagner.silva@jsmc.com.br\",\"subject\":\"consultoria\",\"message\":\"Teste de integração\"}"
+}
+```
+
+```bash
+4. Clicar: "Save"
+
+5. Clicar: "Test"
+
+6. Verificar resposta:
+   ✅ Status code: 200
+   ✅ Body: {"success":true,"message":"Mensagem enviada com sucesso!"}
+
+7. Verificar email chegou em informacoes@jsmc.com.br
+```
+
+✅ **Resultado:** Lambda criada e testada!
+
+---
+
+#### **2.3. Criar API Gateway**
+
+Agora vamos expor a Lambda via API REST pública.
+
+##### **Criar REST API:**
+
+```bash
+1. Acessar API Gateway Console:
+   https://console.aws.amazon.com/apigateway/
+
+2. Clicar: "Create API"
+
+3. Selecionar: "REST API" (não private)
+   Clicar: "Build"
+
+4. Choose the protocol: REST
+   Create new API: New API
+
+5. API name: jsmc-contact-form-api
+
+6. Description: API Gateway para formulário de contato
+
+7. Endpoint Type: Regional
+
+8. Clicar: "Create API"
+```
+
+##### **Criar Resource (Endpoint /contact):**
+
+```bash
+1. Na API criada, clicar: "Actions" > "Create Resource"
+
+2. Resource Name: contact
+
+3. Resource Path: /contact
+   (será auto-preenchido)
+
+4. ☑️ Enable API Gateway CORS
+   (IMPORTANTE para aceitar requisições do website)
+
+5. Clicar: "Create Resource"
+```
+
+##### **Criar Método POST:**
+
+```bash
+1. Com resource /contact selecionado:
+   Clicar: "Actions" > "Create Method"
+
+2. Dropdown: Selecionar "POST" > ✓ (check)
+
+3. Setup:
+   Integration type: Lambda Function
+
+   ☑️ Use Lambda Proxy integration
+   (IMPORTANTE para passar request completo)
+
+   Lambda Region: us-east-1
+
+   Lambda Function: jsmc-contact-form-handler
+   (começar a digitar e auto-completar)
+
+4. Clicar: "Save"
+
+5. Popup "Add Permission to Lambda Function":
+   Clicar: "OK"
+   (Isso permite API Gateway invocar a Lambda)
+```
+
+##### **Configurar CORS (se não ativou antes):**
+
+Se não marcou "Enable CORS" na criação do resource:
+
+```bash
+1. Selecionar resource: /contact
+
+2. Clicar: "Actions" > "Enable CORS"
+
+3. Deixar padrões:
+   Access-Control-Allow-Methods: POST,OPTIONS
+   Access-Control-Allow-Headers: (deixar padrão)
+   Access-Control-Allow-Origin: '*'
+
+4. Clicar: "Enable CORS and replace existing CORS headers"
+
+5. Confirmar: "Yes, replace existing values"
+```
+
+##### **Deploy da API:**
+
+```bash
+1. Clicar: "Actions" > "Deploy API"
+
+2. Deployment stage: [New Stage]
+
+3. Stage name: production
+
+4. Stage description: Ambiente de produção
+
+5. Deployment description: Deploy inicial
+
+6. Clicar: "Deploy"
+```
+
+##### **Obter URL da API:**
+
+```bash
+1. Na tela "Stages" > production
+
+2. No topo, copiar: "Invoke URL"
+
+   Exemplo:
+   https://abc12345.execute-api.us-east-1.amazonaws.com/production
+
+3. Adicionar /contact ao final:
+   https://abc12345.execute-api.us-east-1.amazonaws.com/production/contact
+
+4. ⭐ COPIAR ESTA URL COMPLETA ⭐
+   (você vai usar no Passo 3)
+```
+
+✅ **Resultado:** API Gateway criada e configurada!
+
+---
+
+#### **2.4. Testar API Gateway (via cURL)**
+
+Antes de integrar ao website, teste se a API está funcionando:
+
+```bash
+# No terminal (Mac/Linux) ou Git Bash (Windows):
+
+curl -X POST https://SUA-URL-AQUI.execute-api.us-east-1.amazonaws.com/production/contact \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Teste API",
+    "email": "fagner.silva@jsmc.com.br",
+    "subject": "consultoria",
+    "message": "Teste de integração via cURL"
+  }'
+
+# Resposta esperada:
+{"success":true,"message":"Mensagem enviada com sucesso!"}
+```
+
+**Se der erro 403 Forbidden:**
+- Verificar CORS está habilitado
+- Verificar método POST foi criado
+- Verificar deploy foi feito
+
+**Se der erro 500 Internal:**
+- Ver logs da Lambda: CloudWatch > Log groups > /aws/lambda/jsmc-contact-form-handler
+- Verificar variáveis de ambiente estão corretas
+- Verificar emails estão verificados no SES
+
+✅ **Teste bem-sucedido:** Email deve chegar em informacoes@jsmc.com.br!
+
+---
+
+#### ✅ **Checklist Passo 2 Concluído**
+
+```
+[ ] IAM Role criada: jsmc-contact-form-lambda-role
+[ ] Política SES adicionada à Role
+[ ] Lambda Function criada: jsmc-contact-form-handler
+[ ] Variáveis de ambiente configuradas
+[ ] Timeout ajustado para 30s
+[ ] Código Lambda uploaded (ZIP ou copiar/colar)
+[ ] Lambda testada individualmente (opcional)
+[ ] API Gateway REST API criada: jsmc-contact-form-api
+[ ] Resource /contact criado
+[ ] Método POST configurado
+[ ] CORS habilitado
+[ ] API deployada para stage "production"
+[ ] URL da API copiada: https://xxxxx.../production/contact
+[ ] API testada via cURL (email recebido)
+```
+
+---
+
+### **Passo 3: Configurar API Endpoint no Frontend**
 
 ⏱️ Tempo estimado: 5 minutos
 
-O código da Lambda precisa ser deployado manualmente (ou via GitHub Actions).
+Agora que a API está funcionando, configure o website para usar a URL da API.
+
+#### **Opção A: Editar js/config.js (RECOMENDADO)**
 
 ```bash
-# 1. Entrar no diretório Lambda
-cd lambda
+1. Abrir arquivo: js/config.js
 
-# 2. Instalar dependências
-npm install
-
-# 3. Criar arquivo ZIP
-zip -r function.zip . -x "*.git*" -x "*node_modules/.cache*"
-
-# 4. Upload para Lambda
-aws lambda update-function-code \
-  --function-name jsmc-contact-form-handler-production \
-  --zip-file fileb://function.zip \
-  --region us-east-1
-
-# 5. Verificar sucesso
-aws lambda get-function \
-  --function-name jsmc-contact-form-handler-production \
-  --region us-east-1 \
-  --query 'Configuration.[FunctionName,LastModified,State]' \
-  --output table
+2. Substituir API_ENDPOINT pela URL copiada no Passo 2:
 ```
 
----
-
-### **Passo 4: Configurar API Endpoint no Frontend**
-
-⏱️ Tempo estimado: 2 minutos
-
-Agora você precisa configurar o frontend para usar o API Gateway endpoint.
-
-**Opção A: Editar js/config.js (RECOMENDADO)**
-
 ```javascript
-// Arquivo: js/config.js
-
 window.JSMC_CONFIG = {
-    // Substituir pela URL real do Passo 2
+    // Substituir pela URL REAL copiada no Passo 2.3
     API_ENDPOINT: 'https://abc123xyz.execute-api.us-east-1.amazonaws.com/production/contact',
 
     ENVIRONMENT: 'production',
@@ -457,54 +788,158 @@ window.JSMC_CONFIG = {
 };
 ```
 
-**Opção B: Adicionar inline no HTML**
+```bash
+3. Salvar arquivo
+```
+
+#### **Opção B: Adicionar inline no HTML (Alternativa)**
+
+Se preferir não mexer em arquivos JS:
+
+```bash
+1. Abrir: index.html
+
+2. Localizar: <script src="js/config.js"></script>
+
+3. SUBSTITUIR por:
+```
 
 ```html
-<!-- Antes do </head> no index.html -->
 <script>
   window.JSMC_CONFIG = {
-    API_ENDPOINT: 'https://abc123xyz.execute-api.us-east-1.amazonaws.com/production/contact'
+    API_ENDPOINT: 'https://abc123xyz.execute-api.us-east-1.amazonaws.com/production/contact',
+    ENVIRONMENT: 'production',
+    VERSION: '11.0.0'
   };
 </script>
 ```
 
 ---
 
-### **Passo 5: Deploy do Website**
-
-⏱️ Tempo estimado: 1 minuto
-
-```bash
-# Fazer commit das mudanças
-git add .
-git commit -m "feat: v11 - adicionar formulário de contato funcional com AWS Lambda + SES"
-
-# Push para deploy automático (GitHub Actions)
-git push origin develop
-```
-
-O GitHub Actions vai fazer deploy automático para S3 + invalidar CloudFront.
-
----
-
-### **Passo 6: Testar o Formulário**
+### **Passo 4: Testar Localmente (Opcional)**
 
 ⏱️ Tempo estimado: 3 minutos
 
-1. **Acessar o website:** https://jsmc.com.br
-2. **Ir para seção de Contato**
-3. **Preencher formulário:**
-   - Nome: Seu Nome
-   - Email: seu-email@example.com
-   - Empresa: Sua Empresa
-   - Assunto: Consultoria em Energia
-   - Mensagem: Teste de integração do formulário
+Antes de fazer deploy, teste no seu computador:
 
-4. **Clicar em "Enviar Mensagem"**
-5. **Verificar:**
-   - ✅ Botão muda para "✓ Mensagem enviada com sucesso!"
-   - ✅ Formulário é limpo
-   - ✅ Email chega em informacoes@jsmc.com.br
+```bash
+1. Abrir terminal no diretório do projeto:
+   cd /caminho/para/jsmc-website
+
+2. Iniciar servidor local:
+   # Opção A - Python 3:
+   python3 -m http.server 8080
+
+   # Opção B - Python 2:
+   python -m SimpleHTTPServer 8080
+
+   # Opção C - Node.js (se tiver http-server instalado):
+   npx http-server -p 8080
+
+3. Abrir navegador:
+   http://localhost:8080
+
+4. Ir para seção "Contato"
+
+5. Preencher e enviar formulário
+
+6. Verificar:
+   ✅ Botão muda para "✓ Mensagem enviada com sucesso!"
+   ✅ Formulário é limpo
+   ✅ Email chega em informacoes@jsmc.com.br
+
+7. Parar servidor: Ctrl+C
+```
+
+---
+
+### **Passo 5: Deploy do Website**
+
+⏱️ Tempo estimado: 2 minutos
+
+Fazer deploy das alterações para produção:
+
+```bash
+1. Verificar mudanças:
+   git status
+
+2. Adicionar arquivos modificados:
+   git add js/config.js
+   # ou se usou Opção B:
+   git add index.html
+
+3. Commit:
+   git commit -m "config: adicionar API endpoint do formulário de contato"
+
+4. Push para deploy automático:
+   git push origin develop
+   # ou main, dependendo do seu branch principal
+
+5. Aguardar GitHub Actions (1-2 minutos)
+   - Ver progresso em: https://github.com/seu-repo/actions
+
+6. Após sucesso, aguardar invalidação CloudFront (1-5 minutos)
+```
+
+---
+
+### **Passo 6: Testar em Produção**
+
+⏱️ Tempo estimado: 5 minutos
+
+Teste o formulário no website em produção:
+
+#### **Teste Completo:**
+
+```bash
+1. Acessar: https://jsmc.com.br
+
+2. Scroll até seção "Entre em Contato"
+
+3. Preencher formulário:
+   Nome: Teste Produção
+   Email: fagner.silva@jsmc.com.br
+   Empresa: JSMC Soluções
+   Assunto: Consultoria em Energia
+   Mensagem: Teste do formulário em produção.
+
+4. Clicar: "Enviar Mensagem"
+
+5. Verificar comportamento:
+   ✅ Botão muda para "Enviando..."
+   ✅ Botão desabilitado durante envio
+   ✅ Após 1-2 segundos: "✓ Mensagem enviada com sucesso!"
+   ✅ Botão fica verde
+   ✅ Formulário é limpo automaticamente
+   ✅ Após 3 segundos, botão volta ao normal
+
+6. Verificar email:
+   ✅ Abrir Office 365: informacoes@jsmc.com.br
+   ✅ Email deve ter chegado com:
+      - Assunto: [Website] Consultoria em Energia - Teste Produção
+      - De: noreply@jsmc.com.br
+      - Para: informacoes@jsmc.com.br
+      - Conteúdo formatado em HTML bonito
+
+7. Verificar lista de distribuição:
+   ✅ Email também chegou em fagner.silva@jsmc.com.br
+   ✅ Email também chegou em joao.souza@jsmc.com.br
+```
+
+#### **Teste de Erro (Opcional):**
+
+```bash
+1. Desabilitar internet do computador momentaneamente
+
+2. Tentar enviar formulário
+
+3. Verificar:
+   ✅ Aparece mensagem de erro
+   ✅ Botão fica vermelho: "✗ Erro ao enviar. Tente novamente."
+   ✅ Alert com mensagem amigável e contato alternativo
+
+4. Reabilitar internet
+```
 
 ---
 
