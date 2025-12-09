@@ -521,36 +521,174 @@ Agora vamos criar a função Lambda que processa o formulário.
 4. Clicar: "Save"
 ```
 
-##### **Upload do Código:**
+##### **Upload do Código via GitHub Actions:**
+
+Vamos configurar deploy automático pelo GitHub em vez de upload manual de ZIP.
+
+**Vantagens:**
+- ✅ Deploy automático em cada push
+- ✅ Código versionado no Git
+- ✅ Histórico completo de mudanças
+- ✅ Teste automático após deploy
+
+**Passo 1: Criar IAM Role para GitHub Actions**
 
 ```bash
-1. Aba "Code" > Code source
+1. No Console AWS: IAM > Roles > "Create role"
 
-2. Opção A - Upload via ZIP (RECOMENDADO):
+2. Trusted entity type: "Web identity"
 
-   a. No seu computador, preparar código:
-      cd /caminho/para/jsmc-website/lambda
-      npm install
-      zip -r function.zip .
+3. Identity provider:
+   - Provider: "token.actions.githubusercontent.com"
+   - Audience: "sts.amazonaws.com"
 
-   b. No Console Lambda:
-      - Clicar: "Upload from" > ".zip file"
-      - Selecionar: function.zip
-      - Clicar: "Save"
+4. Clicar: "Next"
 
-3. Opção B - Copiar/Colar código diretamente:
+5. Attach permission policies (criar inline policy):
+   - Clicar: "Create policy" > JSON
+   - Colar JSON abaixo
+   - Nome: "GitHubActionsLambdaDeploy"
 
-   a. Abrir arquivo: lambda/contact-form-handler.js
-   b. Copiar TODO o conteúdo
-   c. No Console Lambda > Code source
-   d. Criar arquivo: contact-form-handler.js
-   e. Colar código
-   f. Clicar: "Deploy"
+6. Clicar: "Next"
 
-   NOTA: Esta opção não instala dependências (aws-sdk).
-   Só funciona porque aws-sdk já vem incluído no runtime Node.js 18
+7. Role name: "github-actions-lambda-deploy"
 
-4. Clicar: "Deploy" (botão laranja no topo)
+8. Clicar: "Create role"
+
+9. COPIAR o ARN (vamos precisar):
+   Exemplo: arn:aws:iam::781705467769:role/github-actions-lambda-deploy
+```
+
+**JSON da Policy:**
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:UpdateFunctionCode",
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration"
+      ],
+      "Resource": "arn:aws:lambda:us-east-1:781705467769:function:jsmc-contact-form-handler"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:DescribeLogStreams",
+        "logs:GetLogEvents",
+        "logs:FilterLogEvents"
+      ],
+      "Resource": "arn:aws:logs:us-east-1:781705467769:log-group:/aws/lambda/jsmc-contact-form-handler:*"
+    }
+  ]
+}
+```
+
+**Passo 2: Configurar GitHub Secrets**
+
+```bash
+1. No GitHub: Settings > Secrets and variables > Actions
+
+2. Clicar: "New repository secret"
+
+3. Name: AWS_LAMBDA_DEPLOY_ROLE_ARN
+   Value: arn:aws:iam::781705467769:role/github-actions-lambda-deploy
+   (use o ARN que você copiou acima)
+
+4. Clicar: "Add secret"
+```
+
+**Passo 3: Fazer Deploy via Git**
+
+```bash
+1. No terminal, no diretório do projeto:
+   cd /Users/fagnergs/Documents/GitHub/jsmc-website
+
+2. Verificar status:
+   git status
+
+3. Adicionar arquivos Lambda:
+   git add lambda/
+   git add .github/workflows/deploy-lambda.yml
+
+4. Fazer commit:
+   git commit -m "feat: adicionar código Lambda para formulário de contato"
+
+5. Push para trigger o deploy:
+   git push origin develop
+
+6. Acompanhar deploy:
+   - GitHub > Actions tab
+   - Ver workflow "Deploy Lambda Function" rodando
+   - Deploy leva ~2-3 minutos
+
+7. Verificar sucesso:
+   ✅ Green checkmark no workflow
+   ✅ Mensagem: "Lambda funcionando corretamente!"
+```
+
+**Passo 4: Verificar Lambda foi Atualizada**
+
+```bash
+1. Console AWS > Lambda > jsmc-contact-form-handler
+
+2. Aba "Code" > Code source
+   - Deve mostrar contact-form-handler.js
+   - Última modificação deve ser recente
+
+3. Aba "Monitor" > "View CloudWatch logs"
+   - Ver logs do teste automático do GitHub Actions
+```
+
+**Troubleshooting:**
+
+❌ **Erro: "User is not authorized to perform: sts:AssumeRoleWithWebIdentity"**
+- Solução: Editar Trust Relationship da Role do GitHub Actions:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::781705467769:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:fagnergs/jsmc-website:*"
+        }
+      }
+    }
+  ]
+}
+```
+
+❌ **Erro: "AccessDeniedException: User is not authorized to perform: lambda:UpdateFunctionCode"**
+- Solução: Verificar ARN da função na policy IAM está correto
+- Verificar secret AWS_LAMBDA_DEPLOY_ROLE_ARN está correto no GitHub
+
+**Deployments Futuros:**
+
+Agora qualquer mudança na pasta `lambda/` dispara deploy automático:
+
+```bash
+# Editar código
+vim lambda/contact-form-handler.js
+
+# Commit e push
+git add lambda/
+git commit -m "fix: corrigir validação de email"
+git push origin develop
+
+# Deploy acontece automaticamente! 🚀
 ```
 
 ##### **Testar Lambda (Opcional):**

@@ -79,11 +79,11 @@ jobs:
       - name: Determine function name
         id: function-name
         run: |
+          # Usando a função criada manualmente no Console AWS
+          echo "name=jsmc-contact-form-handler" >> $GITHUB_OUTPUT
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "name=jsmc-contact-form-handler-production" >> $GITHUB_OUTPUT
             echo "environment=production" >> $GITHUB_OUTPUT
           else
-            echo "name=jsmc-contact-form-handler-staging" >> $GITHUB_OUTPUT
             echo "environment=staging" >> $GITHUB_OUTPUT
           fi
 
@@ -177,26 +177,3 @@ jobs:
         run: |
           echo "❌ Deployment falhou!"
           echo "Verifique os logs acima para mais detalhes."
-
-  validate:
-    name: Validate CloudFormation Template
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_LAMBDA_DEPLOY_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Validate CloudFormation template
-        run: |
-          echo "🔍 Validando template CloudFormation..."
-          aws cloudformation validate-template \
-            --template-body file://aws-contact-form-infrastructure.yaml \
-            --region ${{ env.AWS_REGION }}
-          echo "✅ Template válido!"
