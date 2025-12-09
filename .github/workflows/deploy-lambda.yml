@@ -121,11 +121,18 @@ jobs:
         run: |
           echo "🧪 Testando função Lambda..."
 
-          PAYLOAD='{"httpMethod":"POST","body":"{\"name\":\"GitHub Actions Test\",\"email\":\"test@jsmc.com.br\",\"subject\":\"consultoria\",\"message\":\"Teste automatizado do deploy\"}"}'
+          # Criar arquivo de payload
+          cat > payload.json <<'EOF'
+          {
+            "httpMethod": "POST",
+            "body": "{\"name\":\"GitHub Actions Test\",\"email\":\"test@jsmc.com.br\",\"subject\":\"consultoria\",\"message\":\"Teste automatizado do deploy\"}"
+          }
+          EOF
 
           aws lambda invoke \
             --function-name ${{ steps.function-name.outputs.name }} \
-            --payload "$PAYLOAD" \
+            --cli-binary-format raw-in-base64-out \
+            --payload file://payload.json \
             --region ${{ env.AWS_REGION }} \
             response.json
 
