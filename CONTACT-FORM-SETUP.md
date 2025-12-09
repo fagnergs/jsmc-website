@@ -2,57 +2,363 @@
 
 Este guia explica como configurar o formulário de contato funcional usando AWS Lambda, API Gateway e SES (Simple Email Service).
 
+## ⚠️ IMPORTANTE - Contexto do Ambiente
+
+**Situação atual:**
+- ✅ Domínio **jsmc.com.br** hospedado no **Office 365 (Microsoft)**
+- ✅ Email corporativo funcionando normalmente via Office 365
+- ✅ Lista de distribuição **informacoes@jsmc.com.br** → encaminha para:
+  - fagner.silva@jsmc.com.br
+  - joao.souza@jsmc.com.br
+- 🎯 Objetivo: Usar AWS SES APENAS para enviar emails do formulário do website
+- 🛡️ Garantia: NÃO quebrar emails corporativos existentes
+
+**Estratégia:**
+- AWS SES será usado APENAS para **envio** (não recebimento)
+- Office 365 continua sendo o servidor de email principal (MX records)
+- Não há necessidade de alterar MX records no DNS
+- Apenas adicionar registros SPF/DKIM para autenticação AWS SES
+
 ## 📋 Arquitetura
 
 ```
-Frontend (Website)
+Frontend (jsmc.com.br)
     ↓
-API Gateway (HTTPS endpoint)
+API Gateway (HTTPS)
     ↓
-Lambda Function (Node.js)
+Lambda Function
     ↓
-AWS SES (Envio de email)
+AWS SES (ENVIO apenas)
     ↓
-informacoes@jsmc.com.br
+📧 informacoes@jsmc.com.br
+    ↓
+Office 365 (lista distribuição)
+    ↓
+✅ fagner.silva@jsmc.com.br
+✅ joao.souza@jsmc.com.br
 ```
 
 ---
 
 ## 🚀 Passo a Passo - Setup Completo
 
-### **Passo 1: Verificar Emails no AWS SES**
+### **Passo 1: Configurar AWS SES (Apenas Envio)**
 
-⏱️ Tempo estimado: 10 minutos
+⏱️ Tempo estimado: 20-30 minutos
 
-O AWS SES requer que você verifique os emails que serão usados para enviar e receber mensagens.
+#### 📌 **Parte A: Entender as Opções**
 
-```bash
-# 1. Acessar AWS Console
+Você tem **2 opções** para configurar AWS SES:
+
+**Opção 1: Verificar Emails Individuais (MAIS SIMPLES)** ⭐ RECOMENDADO
+- ✅ Rápido (5 minutos)
+- ✅ Sem alterações no DNS
+- ✅ Não afeta Office 365
+- ⚠️ Limitação: Só envia de emails verificados individualmente
+
+**Opção 2: Verificar Domínio Completo (MAIS AVANÇADO)**
+- ✅ Permite enviar de qualquer email @jsmc.com.br
+- ✅ Melhor reputação de envio (SPF/DKIM)
+- ⚠️ Requer alterações no DNS (não afeta MX records)
+- ⏱️ Mais demorado (20-30 min)
+
+---
+
+#### 📧 **OPÇÃO 1: Verificar Email Individual (Recomendado para Começar)**
+
+Esta opção é ideal para começar rapidamente e testar. **Não requer alterações no DNS.**
+
+##### **1.1. Acessar AWS SES Console**
+
+```
 https://console.aws.amazon.com/ses/
-
-# 2. Navegar para: Email Addresses > Verify a New Email Address
-
-# 3. Adicionar emails:
-   - informacoes@jsmc.com.br (remetente e destinatário)
-   - Outros emails que queira receber cópia (opcional)
-
-# 4. Verificar email
-   - Abrir email recebido da AWS
-   - Clicar no link de verificação
-   - Status deve mudar para "verified" (verde)
 ```
 
-**IMPORTANTE:** Por padrão, AWS SES está em "Sandbox mode", que só permite enviar emails para endereços verificados. Para produção:
+**⚠️ IMPORTANTE:** Certifique-se de estar na região **us-east-1 (N. Virginia)**
+
+##### **1.2. Verificar Email de Envio (FROM)**
 
 ```bash
-# Solicitar saída do Sandbox (produção)
-# https://console.aws.amazon.com/ses/ > Account Dashboard > Request Production Access
+# Na AWS Console SES:
+1. Menu lateral: "Verified identities" > "Create identity"
+2. Selecionar: "Email address"
+3. Email: noreply@jsmc.com.br
+   (ou outro email que você controla no Office 365)
+4. Clicar: "Create identity"
 
-# Preencher formulário:
-# - Use case: Transactional emails (contact form)
-# - Website: https://jsmc.com.br
-# - Describe how you will comply with AWS policies
-# - Estimativa: < 1000 emails/mês
+# Você receberá um email da AWS no Office 365
+5. Abrir inbox do Office 365: noreply@jsmc.com.br
+6. Procurar email: "Amazon Web Services – Email Address Verification Request"
+7. Clicar no link de verificação
+8. Status mudará para "Verified" ✅
+```
+
+**💡 Por que usar noreply@jsmc.com.br?**
+- É um email que você controla no Office 365
+- Indica claramente que é enviado automaticamente
+- Seguindo boas práticas de email transacional
+
+##### **1.3. Verificar Emails de Destino (TO)**
+
+Como o SES está em **Sandbox mode** por padrão, você precisa verificar os emails que vão **receber** mensagens:
+
+```bash
+# Repetir processo acima para:
+1. informacoes@jsmc.com.br
+2. fagner.silva@jsmc.com.br
+3. joao.souza@jsmc.com.br
+
+# Para cada email:
+- Menu: "Verified identities" > "Create identity"
+- Selecionar: "Email address"
+- Inserir email
+- Verificar na caixa de entrada (Office 365)
+```
+
+##### **1.4. Solicitar Saída do Sandbox (Produção)**
+
+⏱️ **Aprovação: 24-48 horas**
+
+```bash
+# No AWS SES Console:
+1. Menu: "Account dashboard"
+2. Clicar: "Request production access"
+3. Preencher formulário:
+
+   Mail Type: Transactional
+   Website URL: https://jsmc.com.br
+   Use Case Description:
+   "Website contact form for JSMC Soluções, energy consulting company.
+    Sending transactional emails only when users submit contact form.
+    Expected volume: < 100 emails/month.
+    Emails will be sent to verified business email addresses only."
+
+   Compliance:
+   "We only send emails when users explicitly submit our contact form.
+    We do not send marketing emails. All recipients are verified business contacts."
+
+4. Submit
+```
+
+**Enquanto aguarda aprovação:**
+- ✅ Você pode continuar no Sandbox mode
+- ✅ Só consegue enviar para emails verificados
+- ✅ Suficiente para desenvolvimento e testes
+
+**Após aprovação:**
+- ✅ Pode enviar para qualquer email
+- ✅ Limite de 50.000 emails/dia
+- ✅ Pronto para produção
+
+---
+
+#### 🌐 **OPÇÃO 2: Verificar Domínio Completo (Avançado)**
+
+Esta opção permite enviar de qualquer email @jsmc.com.br e melhora a reputação de entrega.
+
+**⚠️ ATENÇÃO:** Requer alterações no DNS, mas **NÃO afeta o Office 365**
+
+##### **2.1. Verificar Domínio no SES**
+
+```bash
+# No AWS SES Console:
+1. Menu: "Verified identities" > "Create identity"
+2. Selecionar: "Domain"
+3. Domain: jsmc.com.br
+4. Advanced DKIM settings: "Easy DKIM" (deixar padrão)
+5. Clicar: "Create identity"
+```
+
+##### **2.2. Obter Registros DNS**
+
+A AWS vai gerar 3 tipos de registros DNS:
+
+```
+📋 REGISTROS FORNECIDOS PELA AWS:
+
+1. DKIM Records (3 registros CNAME):
+   - xxxxx._domainkey.jsmc.com.br → xxxxx.dkim.amazonses.com
+   - yyyyy._domainkey.jsmc.com.br → yyyyy.dkim.amazonses.com
+   - zzzzz._domainkey.jsmc.com.br → zzzzz.dkim.amazonses.com
+
+2. Domínio Verification (1 registro TXT):
+   - _amazonses.jsmc.com.br → "valor-gerado-pela-aws"
+
+3. SPF (opcional, recomendado)
+```
+
+##### **2.3. Adicionar Registros no DNS Microsoft (Office 365)**
+
+**🔐 IMPORTANTE: Estas alterações NÃO afetam o Office 365!**
+- ✅ MX records continuam apontando para Office 365
+- ✅ Email corporativo continua funcionando normalmente
+- ✅ Apenas adiciona autenticação extra para AWS SES
+
+##### **🖥️ Passo-a-Passo no Portal Microsoft 365:**
+
+```bash
+1. Acessar Admin Center:
+   https://admin.microsoft.com
+
+2. Navegar para DNS:
+   Settings > Domains > jsmc.com.br > DNS records
+
+3. Clicar: "Add record" ou "Custom records"
+```
+
+##### **📝 Adicionar DKIM Records (3 registros):**
+
+Para cada um dos 3 registros DKIM fornecidos pela AWS:
+
+```
+Tipo: CNAME
+Nome/Host: xxxxx._domainkey
+Aponta para: xxxxx.dkim.amazonses.com
+TTL: 3600 (ou deixar padrão)
+
+Tipo: CNAME
+Nome/Host: yyyyy._domainkey
+Aponta para: yyyyy.dkim.amazonses.com
+TTL: 3600
+
+Tipo: CNAME
+Nome/Host: zzzzz._domainkey
+Aponta para: zzzzz.dkim.amazonses.com
+TTL: 3600
+```
+
+⚠️ **NOTA:** Os valores `xxxxx`, `yyyyy`, `zzzzz` serão strings longas fornecidas pela AWS.
+
+##### **📝 Adicionar Verification Record (1 registro):**
+
+```
+Tipo: TXT
+Nome/Host: _amazonses
+Valor: "valor-longo-fornecido-pela-aws"
+TTL: 3600
+```
+
+##### **📝 Atualizar SPF Record (se necessário):**
+
+**Verificar registro SPF existente:**
+
+```bash
+# Via terminal ou ferramenta online
+nslookup -type=TXT jsmc.com.br
+
+# Você verá algo como:
+"v=spf1 include:spf.protection.outlook.com ~all"
+```
+
+**Se o SPF já existe (provavelmente sim para Office 365):**
+
+```
+Tipo: TXT
+Nome/Host: @ (ou jsmc.com.br ou deixe vazio)
+Valor ANTIGO: "v=spf1 include:spf.protection.outlook.com ~all"
+Valor NOVO:   "v=spf1 include:spf.protection.outlook.com include:amazonses.com ~all"
+                          ↑ Office 365 mantido     ↑ AWS SES adicionado
+```
+
+⚠️ **CUIDADO:**
+- Apenas ADICIONE `include:amazonses.com` ao registro existente
+- NÃO substitua o registro inteiro
+- NÃO remova `include:spf.protection.outlook.com`
+
+**Se o SPF NÃO existe (improvável):**
+
+```
+Tipo: TXT
+Nome/Host: @ (ou jsmc.com.br)
+Valor: "v=spf1 include:spf.protection.outlook.com include:amazonses.com ~all"
+```
+
+##### **2.4. Aguardar Propagação DNS**
+
+```bash
+# Tempo de propagação: 15 minutos a 72 horas (geralmente < 1 hora)
+
+# Verificar status no AWS SES:
+1. Menu: "Verified identities"
+2. Clicar em: jsmc.com.br
+3. Status deve mudar para "Verified" ✅
+
+# Verificar DNS propagou (via terminal):
+nslookup -type=CNAME xxxxx._domainkey.jsmc.com.br
+nslookup -type=TXT _amazonses.jsmc.com.br
+nslookup -type=TXT jsmc.com.br  # Ver SPF
+```
+
+##### **2.5. Testar Configuração**
+
+```bash
+# No AWS SES Console:
+1. Menu: "Verified identities" > jsmc.com.br
+2. Aba: "Authentication"
+3. Verificar:
+   - DKIM status: ✅ Successful
+   - Domain status: ✅ Verified
+```
+
+---
+
+#### ✅ **Checklist Passo 1 Concluído**
+
+**Opção 1 (Email Individual):**
+```
+[ ] noreply@jsmc.com.br verificado no SES
+[ ] informacoes@jsmc.com.br verificado no SES
+[ ] fagner.silva@jsmc.com.br verificado no SES (opcional)
+[ ] joao.souza@jsmc.com.br verificado no SES (opcional)
+[ ] Request production access submetido (aguardar aprovação)
+```
+
+**Opção 2 (Domínio Completo):**
+```
+[ ] Domínio jsmc.com.br verificado no SES
+[ ] 3 registros DKIM adicionados no DNS Microsoft
+[ ] 1 registro _amazonses TXT adicionado
+[ ] SPF atualizado (include:amazonses.com adicionado)
+[ ] DNS propagado (verificado via nslookup)
+[ ] Status "Verified" no AWS SES Console
+[ ] Request production access submetido
+```
+
+---
+
+#### 🔍 **Troubleshooting Passo 1**
+
+**Problema: Email de verificação não chega**
+```
+Solução:
+1. Verificar pasta de SPAM/Lixo Eletrônico no Office 365
+2. Aguardar até 15 minutos
+3. Reenviar verificação no AWS Console
+```
+
+**Problema: DNS não propaga (Opção 2)**
+```
+Solução:
+1. Verificar registros no Admin Microsoft 365
+2. Aguardar até 1 hora
+3. Testar com: https://mxtoolbox.com/SuperTool.aspx?action=txt:_amazonses.jsmc.com.br
+4. Verificar TTL está correto (3600)
+```
+
+**Problema: SPF com múltiplos includes excede limite**
+```
+SPF tem limite de 10 "includes"
+Solução: Consolidar ou usar ferramentas de flattening
+Ferramenta: https://www.autospf.com/
+```
+
+**Preocupação: "Vou quebrar o Office 365?"**
+```
+✅ NÃO VAI QUEBRAR!
+- MX records continuam intocados (apontam para Microsoft)
+- Você está apenas ADICIONANDO registros extras
+- Office 365 continuará recebendo emails normalmente
+- AWS SES só será usado para ENVIAR via Lambda
 ```
 
 ---
