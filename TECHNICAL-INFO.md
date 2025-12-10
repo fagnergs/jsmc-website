@@ -335,7 +335,7 @@ jsmc-website/
 │
 ├── js/
 │   ├── main.js                           # Main JavaScript (310 linhas)
-│   └── config.js                         # Configuration (516 linhas)
+│   └── config.js                         # Configuration (17 linhas)
 │
 ├── lambda/
 │   ├── contact-form-handler.js           # Lambda function handler
@@ -381,7 +381,7 @@ jsmc-website/
 index.html        : 25.1 KB (436 linhas)
 css/styles.css    : 17.1 KB (887 linhas)
 js/main.js        : 10.7 KB (310 linhas)
-js/config.js      :  0.5 KB (516 linhas)
+js/config.js      :  0.5 KB (17 linhas)
 
 # Configuração
 package.json      :  1.3 KB
