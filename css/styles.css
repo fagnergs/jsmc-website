@@ -885,3 +885,244 @@ body {
 .scroll-hidden {
     overflow: hidden;
 }
+
+/* ==================== SEÇÃO INSTITUCIONAL ==================== */
+
+.institucional {
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.institucional .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+/* --- Sobre a Empresa --- */
+
+.institucional-about {
+    margin-bottom: 80px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.institucional-about h3 {
+    font-size: 2rem;
+    color: #00A3D9;
+    margin-bottom: 30px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.institucional-about h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: #FF8C42;
+}
+
+.institucional-about .about-content p {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.institucional-about strong {
+    color: #2C3E50;
+    font-weight: 600;
+}
+
+/* --- Downloads --- */
+
+.institucional-downloads {
+    margin-bottom: 80px;
+}
+
+.institucional-downloads h3 {
+    font-size: 2rem;
+    color: #00A3D9;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.download-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.download-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+.download-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.download-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #00A3D9, #FF8C42);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.download-icon svg {
+    width: 30px;
+    height: 30px;
+}
+
+.download-card h4 {
+    font-size: 1.25rem;
+    color: #2C3E50;
+    margin-bottom: 15px;
+}
+
+.download-card p {
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.btn-download {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #00A3D9;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.btn-download:hover {
+    background: #FF8C42;
+}
+
+.file-size {
+    display: block;
+    font-size: 0.875rem;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+/* --- Vídeos --- */
+
+.institucional-videos {
+    margin-bottom: 40px;
+}
+
+.institucional-videos h3 {
+    font-size: 2rem;
+    color: #00A3D9;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.video-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.video-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+    background: #000;
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.video-card h4 {
+    font-size: 1.25rem;
+    color: #2C3E50;
+    padding: 20px 20px 10px;
+    margin: 0;
+}
+
+.video-card p {
+    color: #666;
+    padding: 0 20px 20px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* --- Responsivo --- */
+
+@media (max-width: 768px) {
+    .institucional {
+        padding: 60px 15px;
+    }
+
+    .institucional-about h3,
+    .institucional-downloads h3,
+    .institucional-videos h3 {
+        font-size: 1.5rem;
+    }
+
+    .download-grid,
+    .videos-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .videos-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .institucional .section-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .download-card,
+    .video-card {
+        padding: 20px;
+    }
+
+    .institucional-about .about-content p {
+        font-size: 1rem;
+    }
+}
+
