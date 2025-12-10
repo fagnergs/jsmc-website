@@ -1,0 +1,74 @@
+name: Deploy JSMC Website to Azure
+
+on:
+  push:
+    branches: [ jsmc-azure ]
+  workflow_dispatch:
+
+env:
+  AZURE_RESOURCE_GROUP: rg-jsmc-website-prod
+  AZURE_STORAGE_ACCOUNT: jsmcwebsiteprod
+  AZURE_FRONTDOOR_PROFILE: fd-jsmc-website-prod
+  AZURE_FRONTDOOR_ENDPOINT: jsmc-website
+
+jobs:
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # OIDC authentication
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Storage ($web)
+        run: |
+          az storage blob upload-batch \
+            --account-name ${{ env.AZURE_STORAGE_ACCOUNT }} \
+            --auth-mode login \
+            --destination '$web' \
+            --source . \
+            --pattern "*.html" --pattern "*.css" --pattern "*.js" \
+            --pattern "*.jpg" --pattern "*.png" --pattern "*.svg" --pattern "*.ico" --pattern "*.webp" \
+            --pattern "*.pdf" --pattern "*.mp4" \
+            --content-cache-control "public, max-age=3600" \
+            --overwrite \
+            --exclude ".git/*" --exclude "node_modules/*" --exclude ".github/*" \
+            --exclude "lambda/*" --exclude "scripts/*"
+
+      - name: Purge Azure Front Door Cache
+        run: |
+          az afd endpoint purge \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --profile-name ${{ env.AZURE_FRONTDOOR_PROFILE }} \
+            --endpoint-name ${{ env.AZURE_FRONTDOOR_ENDPOINT }} \
+            --content-paths "/*"
+
+      - name: Deployment Summary
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo ""
+          echo "📦 Deployed to: https://jsmc.com.br"
+          echo "⏱️  Cache purged: Azure Front Door"
+          echo "🔄 Branch: jsmc-azure"
+          echo ""
+          echo "Next steps:"
+          echo "  1. Verify website: https://jsmc.com.br"
+          echo "  2. Test contact form"
+          echo "  3. Check Application Insights for errors"
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Check logs above for details"
+          exit 1
