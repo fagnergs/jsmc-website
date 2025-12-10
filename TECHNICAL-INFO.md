@@ -4,7 +4,7 @@
 
 **Documentação Técnica Completa do Projeto**
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/fagnergs/jsmc-website)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/JSMC-Solucoes/website)
 [![Node](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg)](https://nodejs.org)
 [![AWS](https://img.shields.io/badge/AWS-S3%20%7C%20CloudFront-orange.svg)](https://aws.amazon.com)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -52,8 +52,9 @@ Apresentar serviços de consultoria em energia, automação, IoT e regulação d
 ### Informações do Repositório
 ```
 Nome: jsmc-website
-Owner: fagnergs
-URL: https://github.com/fagnergs/jsmc-website
+Owner: JSMC-Solucoes
+URL: https://github.com/JSMC-Solucoes/website
+Current Fork: https://github.com/JSMC-Solucoes/website
 Versão: 1.0.0
 Licença: MIT
 Status: Production Ready ✅
@@ -97,7 +98,7 @@ Tamanho: ~17KB
 #### JavaScript
 ```
 Versão: ES6+ (Vanilla JavaScript)
-Total de Linhas: 310 linhas (main.js) + 516 linhas (config.js)
+Total de Linhas: 310 linhas (main.js) + 17 linhas (config.js)
 Arquivos: js/main.js, js/config.js
 ```
 
@@ -234,7 +235,7 @@ Package Manager: npm
 ┌─────────────────────────────────────────────────────────────────┐
 │                  GitHub Repository                              │
 │  ┌────────────────────────────────────────────────────────┐    │
-│  │ Repository: fagnergs/jsmc-website                      │    │
+│  │ Repository: JSMC-Solucoes/website                      │    │
 │  │ Branch Protection: main (required reviews)             │    │
 │  │ Secrets: AWS_*, CLOUDFRONT_*                           │    │
 │  └────────────────────────────────────────────────────────┘    │
@@ -401,10 +402,11 @@ aws-infra.yaml    :  7.5 KB (235 linhas)
 │              ESTATÍSTICAS DO CÓDIGO                │
 ├────────────────────────────────────────────────────┤
 │ Total de Arquivos:           ~50 arquivos         │
-│ Linhas de Código (LOC):      1,633 linhas         │
-│   - HTML:                    436 linhas (26.7%)   │
-│   - CSS:                     887 linhas (54.3%)   │
-│   - JavaScript:              310 linhas (19.0%)   │
+│ Linhas de Código (LOC):      1,650 linhas         │
+│   - HTML:                    436 linhas (26.4%)   │
+│   - CSS:                     887 linhas (53.8%)   │
+│   - JavaScript (main.js):    310 linhas (18.8%)   │
+│   - JavaScript (config.js):   17 linhas (1.0%)    │
 │                                                    │
 │ Arquivos de Configuração:    ~10 arquivos         │
 │ Documentação:                8 arquivos MD         │
@@ -605,7 +607,7 @@ Propósito: OIDC authentication para CI/CD
 
 Trust Policy:
   - Provider: token.actions.githubusercontent.com
-  - Repo: fagnergs/jsmc-website
+  - Repo: JSMC-Solucoes/website
   - Condition: sts.amazonaws.com audience
   
 Permissions:
@@ -721,7 +723,7 @@ Status: CREATE_COMPLETE
 Parameters:
   - DomainName: jsmc.com.br
   - CertificateArn: arn:aws:acm:...
-  - GitHubRepo: fagnergs/jsmc-website
+  - GitHubRepo: JSMC-Solucoes/website
 
 Outputs:
   - S3BucketName: jsmc-website-{AccountId}
@@ -1130,7 +1132,7 @@ GitHub Actions:
 AWS IAM OIDC:
   - Provider: token.actions.githubusercontent.com
   - Audience: sts.amazonaws.com
-  - Subject: repo:fagnergs/jsmc-website:*
+  - Subject: repo:JSMC-Solucoes/website:*
   - Session Duration: 1 hora
 ```
 
@@ -1214,7 +1216,7 @@ RPO (Recovery Point Objective):
 
 ```bash
 # 1. Clonar repositório
-git clone https://github.com/fagnergs/jsmc-website.git
+git clone https://github.com/JSMC-Solucoes/website.git
 cd jsmc-website
 
 # 2. Instalar dependências
@@ -1567,7 +1569,7 @@ CloudWatch: Logging and monitoring
 
 #### 3. GitHub
 ```yaml
-Repository: fagnergs/jsmc-website
+Repository: JSMC-Solucoes/website
 CI/CD: GitHub Actions
 Authentication: OIDC (no static keys)
 Secrets: Encrypted
@@ -1662,7 +1664,7 @@ TECHNICAL-INFO.md          - Este arquivo (informações técnicas)
 
 ```
 Website: https://jsmc.com.br
-GitHub: https://github.com/fagnergs/jsmc-website
+GitHub: https://github.com/JSMC-Solucoes/website
 AWS Console: https://console.aws.amazon.com
 CloudFront: https://console.aws.amazon.com/cloudfront
 S3: https://console.aws.amazon.com/s3
@@ -1673,17 +1675,12 @@ S3: https://console.aws.amazon.com/s3
 ```yaml
 Empresa: JSMC Soluções
 Email Geral: informacoes@jsmc.com.br
-Telefone: +55 11 92002-9999
+Website: https://jsmc.com.br
 Localização: Rio Claro - SP, Brasil
 
-Responsáveis:
-  - João de Souza (Diretor)
-    - Email: joao.souza@jsmc.com.br
-    - Tel: (11) 99194-0590
-  
-  - Fagner Silva (Tecnologia)
-    - Email: fagner.silva@jsmc.com.br
-    - Tel: (21) 99254-456
+Para informações técnicas e suporte:
+  - Email: informacoes@jsmc.com.br
+  - Consulte a seção de contato no website
 ```
 
 ---
@@ -1784,12 +1781,12 @@ Uptime: 99.9% (SLA AWS)
 **Versão 1.0.0**
 
 [![Status](https://img.shields.io/badge/status-production-brightgreen.svg)](https://jsmc.com.br)
-[![Maintained](https://img.shields.io/badge/maintained-yes-blue.svg)](https://github.com/fagnergs/jsmc-website)
+[![Maintained](https://img.shields.io/badge/maintained-yes-blue.svg)](https://github.com/JSMC-Solucoes/website)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **Desenvolvido com ❤️ para JSMC Soluções**
 
-[📧 Email](mailto:informacoes@jsmc.com.br) • [🌐 Website](https://jsmc.com.br) • [💻 GitHub](https://github.com/fagnergs/jsmc-website)
+[📧 Email](mailto:informacoes@jsmc.com.br) • [🌐 Website](https://jsmc.com.br) • [💻 GitHub](https://github.com/JSMC-Solucoes/website)
 
 </div>
 
